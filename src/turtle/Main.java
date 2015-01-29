@@ -11,34 +11,40 @@ public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
       
-    Paper p = new Paper(4,5);
-    Turtle t = new Turtle(new Coordinate(2,2),Direction.NORTH,Pen.DOWN,p);
-    t.changeBrush('#');
-    
-    
-    //t.rotate(Direction.NORTH_EAST, Rotation.RIGHT, 1);
-    //t.rotate(0,RIGHT,1);
-    //t.rotate(45,RIGHT,1);
-    
-    /*
-    t.move(1);
-    System.out.println("Direction: " + t.turtleDirection());
-    t.rotate(Direction.NORTH, Rotation.RIGHT,2);
-    System.out.println("Direction: " + t.turtleDirection());
-    t.move(2);
-    */
-   
-    System.out.println(t.turtleDirection());
-    
-   // System.out.println(p.toString(t));
-    
-    /*
-     * [1,1,1,1,1]
-     * [1,1,1,1,1]
-     * [1,1,1,1,1]
-     * [1,1,1,1,1]
-     * 
-     */
+      Coordinate position = new Coordinate(4,1);
+      Paper p = new Paper(10,10);
+      Direction d = Direction.NORTH_WEST;
+      Turtle t = new Turtle(position, d, Pen.DOWN, p);
+      
+      t.changeBrush('#');
+      
+      
+      //p.write(new Coordinate(5,2), '#');
+      //for (int i=0; i<3; i++) {
+      //  d.rotate(Rotation.LEFT);
+      //}
+     
+      t.move(2);
+      //t.rotate(Direction.NORTH_EAST, Rotation.LEFT, 3);
+      //t.move(3);
+      //t.rotate(Direction.EAST, Rotation.RIGHT, 2);
+      //t.move(3);
+      
+      t.turtleStats();
+      
+      
+      System.out.println(p.toString(t));
+      System.out.println("Width: " + p.getWidth() + " Height: " + p.getHeight());
+      
+
+      
+      
+      
+      
+      //Test cases
+      
+      
+      TestCases.Test.containsTest(p);
       
       
     }

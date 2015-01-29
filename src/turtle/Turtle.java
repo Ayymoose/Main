@@ -13,7 +13,7 @@ public class Turtle {
   
 
   //Constructor
-  Turtle(Coordinate position,Direction direction,Pen penState,Paper paper) {
+  public Turtle(Coordinate position,Direction direction,Pen penState,Paper paper) {
     this.position = position;
     this.direction = direction;
     this.penState = penState;
@@ -29,6 +29,18 @@ public class Turtle {
     return direction;
   }
   
+  public void turtleStats() {
+    System.out.println("");
+    System.out.println("\\**********************/");
+    System.out.println("Turtle is @" + position);
+    System.out.println("Direction is " + direction);
+    System.out.println("Pen is " + penState);
+    System.out.println("Brush is " + (int)brush);
+    System.out.println("\\**********************/");
+    System.out.println("");
+    
+  } 
+  
   
   //
   
@@ -43,8 +55,10 @@ public class Turtle {
   public void rotate(Direction direction,Rotation rotation,int n) {
     //Left off @17:53
     //Left off @17:54 (the next day)
-
-    
+    //Started and finished @ 13:29! (the day after that!) 
+    for (int i=0; i<n; i++) {
+      this.direction = direction.rotate(rotation);
+    }
   }
   
   public void draw() {
@@ -55,18 +69,26 @@ public class Turtle {
   
   public void move(int steps) {
     
+    int turtleSteps;
     int stepsAvailable;
     int currentX;
     int currentY;
     
     switch (direction) {
       case NORTH:
-        currentX = position.getX();
         
-        for (int i=currentX; i<currentX+steps; i++) {
-          paper.write(position.getX(), position.getY(),brush);
-          position.update(position.getX()-1,position.getY());
+        currentY = position.getY();
+        
+        //Calculate the available steps remaining
+        stepsAvailable = paper.getHeight() - currentY;
+        
+        turtleSteps = (steps < stepsAvailable ? currentY+steps : currentY+stepsAvailable-1);
+        
+        for (int i=currentY; i<turtleSteps; i++) {
+          paper.write(position,brush);
+          position.update(position.getX(),position.getY()+1);
         }
+
         break;
         
       case NORTH_EAST:
@@ -76,10 +98,15 @@ public class Turtle {
         break;
       case EAST:
         
-        currentY = position.getY();
-        for (int i=currentY; i<currentY+steps; i++) {
-          paper.write(position.getX(), position.getY(),brush);
-          position.update(position.getX(),position.getY()+1);
+        currentX = position.getX();
+        
+        //Calculate the available steps remaining
+        stepsAvailable = paper.getWidth() - currentX;
+        turtleSteps = (steps < stepsAvailable ? currentX+steps : currentX+stepsAvailable-1);
+        
+        for (int i=currentX; i<turtleSteps; i++) {
+          paper.write(position,brush);
+          position.update(position.getX()+1,position.getY());
         }
         
         
@@ -88,13 +115,50 @@ public class Turtle {
         break;
       case SOUTH:
         
+        currentY = position.getY();
+
+        //Calculate the available steps remaining
+        stepsAvailable = paper.getHeight() - currentY;
+        turtleSteps = (steps < stepsAvailable ? currentY+steps : currentY+stepsAvailable-1);
+
+        for (int i=currentY; i<turtleSteps; i++) {
+          paper.write(position,brush);
+          position.update(position.getX(),position.getY()-1);
+        }
+
+
+        
         break;
       case SOUTH_WEST:
         break;
       case WEST:
+        
+        
+        currentX = position.getX();
+
+        //Calculate the available steps remaining
+        stepsAvailable = paper.getWidth() - currentX;
+        turtleSteps = (steps < stepsAvailable ? currentX+steps : currentX+stepsAvailable-1);
+
+        for (int i=currentX; i<turtleSteps; i++) {
+          paper.write(position,brush);
+          position.update(position.getX()-1,position.getY());
+        }
+
+        
+        
         break;
       default:
 
+
+        currentY = position.getY();
+        currentX = position.getX();
+        
+        for (int i=currentY; i<currentY+steps; i++) {
+          paper.write(position.getX(), position.getY(),brush);
+          position.update(position.getX()-1,position.getY()+1);
+        }
+        
         break;
     }
   }
@@ -107,6 +171,7 @@ public class Turtle {
    * [0,0,0,0,0]
    */
    
+
 
   
 }
