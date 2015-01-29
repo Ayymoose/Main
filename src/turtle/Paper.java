@@ -35,7 +35,7 @@ public class Paper {
   
   public void write(Coordinate position,char c) {
     if (contains(position)) {
-      paper[width - position.getY() - 1][position.getX()] = c;
+      paper[position.getY() ][width - position.getX() - 1] = c;
     }
   }
   
@@ -47,15 +47,15 @@ public class Paper {
   
   public String toString(Turtle t) {
     StringBuilder sb = new StringBuilder();
-    for (int x=0; x<height; x++) {
+    for (int x=height-1; x!=-1; x--) {
       sb.append('[');
-      for (int y=0; y<width; y++) {
-        if (x == width - t.turtlePosition().getY() - 1 && y == t.turtlePosition().getX()) {
+      for (int y=width-1; y!=-1; y--) {
+        if (x == t.turtlePosition().getY()  && y == width - t.turtlePosition().getX() - 1 ) { //Turtle pos
           sb.append('@');
         } else {
           sb.append(paper[x][y]);
         }
-        if (y != width-1) {
+        if (y != 0) {
           sb.append(',');
         }
       }

@@ -69,8 +69,10 @@ public class Turtle {
   
   public void move(int steps) {
     
+
+    
     int turtleSteps;
-    int stepsAvailable;
+    int stepsMax;
     int currentX;
     int currentY;
     
@@ -80,12 +82,13 @@ public class Turtle {
         currentY = position.getY();
         
         //Calculate the available steps remaining
-        stepsAvailable = paper.getHeight() - currentY;
+        stepsMax = paper.getHeight() - currentY;
         
-        turtleSteps = (steps < stepsAvailable ? currentY+steps : currentY+stepsAvailable-1);
+        turtleSteps = (steps < stepsMax ? currentY+steps : currentY+stepsMax-1);
         
         for (int i=currentY; i<turtleSteps; i++) {
-          paper.write(position,brush);
+          draw();
+          //paper.write(position,brush);
           position.update(position.getX(),position.getY()+1);
         }
 
@@ -101,11 +104,12 @@ public class Turtle {
         currentX = position.getX();
         
         //Calculate the available steps remaining
-        stepsAvailable = paper.getWidth() - currentX;
-        turtleSteps = (steps < stepsAvailable ? currentX+steps : currentX+stepsAvailable-1);
+        stepsMax = paper.getWidth() - currentX;
+        turtleSteps = (steps < stepsMax ? currentX+steps : currentX+stepsMax-1);
         
         for (int i=currentX; i<turtleSteps; i++) {
-          paper.write(position,brush);
+          draw();
+          //paper.write(position,brush);
           position.update(position.getX()+1,position.getY());
         }
         
@@ -118,11 +122,12 @@ public class Turtle {
         currentY = position.getY();
 
         //Calculate the available steps remaining
-        stepsAvailable = paper.getHeight() - currentY;
-        turtleSteps = (steps < stepsAvailable ? currentY+steps : currentY+stepsAvailable-1);
+        stepsMax = paper.getHeight() - currentY;
+        turtleSteps = (steps < stepsMax ? currentY+steps : currentY+stepsMax-1);
 
         for (int i=currentY; i<turtleSteps; i++) {
-          paper.write(position,brush);
+          draw();
+          //paper.write(position,brush);
           position.update(position.getX(),position.getY()-1);
         }
 
@@ -137,11 +142,12 @@ public class Turtle {
         currentX = position.getX();
 
         //Calculate the available steps remaining
-        stepsAvailable = paper.getWidth() - currentX;
-        turtleSteps = (steps < stepsAvailable ? currentX+steps : currentX+stepsAvailable-1);
+        stepsMax = paper.getWidth() - currentX;
+        turtleSteps = (steps < stepsMax ? currentX+steps : currentX+stepsMax-1);
 
         for (int i=currentX; i<turtleSteps; i++) {
-          paper.write(position,brush);
+          draw();
+          //paper.write(position,brush);
           position.update(position.getX()-1,position.getY());
         }
 
@@ -154,10 +160,27 @@ public class Turtle {
         currentY = position.getY();
         currentX = position.getX();
         
-        for (int i=currentY; i<currentY+steps; i++) {
-          paper.write(position.getX(), position.getY(),brush);
+       
+        
+        int dx = position.getX();
+        int dy = paper.getHeight() - currentY - 1;
+        
+        stepsMax = Math.min(dx,dy);
+        
+        //System.out.println("Avail X " + dx);
+        //System.out.println("Avail Y " + dy);
+        System.out.println("StepMax " + stepsMax);
+        
+        turtleSteps = (steps < stepsMax ? currentX+steps : currentX+stepsMax);
+
+        for (int i=currentX; i<turtleSteps; i++) {
+          draw();
+          //paper.write(position.getX(), position.getY(),brush);
           position.update(position.getX()-1,position.getY()+1);
         }
+        
+        
+        
         
         break;
     }
