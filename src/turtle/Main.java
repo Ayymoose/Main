@@ -8,51 +8,31 @@ import util.Rotation;
 
 
 public class Main {
+  
+  
+  
+  /*
+   * The main method should check the program’s arguments to see where the input should be
+     read from and where the output should be written to. 
+     
+     It should also create the appropriate
+     Scanner and PrintStream instances. It should then create a new TurtleInterpreter, and use the
+     aforementioned public method to process the commands in the input.
+   */
 
     public static void main(String[] args) throws FileNotFoundException {
       
-      Coordinate position = new Coordinate(5,3);
-      Paper p = new Paper(12,10);
-      Direction d = Direction.SOUTH_EAST;
-      Turtle t = new Turtle(position, d, Pen.DOWN, p);
-      t.changeBrush('#');
-      t.move(10);
+      //Now
+      //input is from command line
+      //output is via command line
       
-      /*
+      TurtleInterpreter tp = new TurtleInterpreter();
       
-      t.changeBrush('#');
-      t.move(2);
-      t.rotate(Direction.NORTH_EAST, Rotation.RIGHT, 1);
-      t.move(3);
-      t.changeBrush('$');
-      t.rotate(Direction.NORTH_EAST, Rotation.RIGHT, 3);
-      t.move(3);
-      t.changeBrush('#');
-      t.rotate(Direction.NORTH_EAST, Rotation.LEFT, 2);
-      t.move(6);
-      t.rotate(Direction.NORTH_EAST, Rotation.RIGHT,3);
-      t.move(3);
-      t.rotate(Direction.NORTH_EAST, Rotation.RIGHT,1);
-      t.move(4);
-      
-      */
-      
-      // t.move(0);
-      //t.rotate(Direction.NORTH_EAST, Rotation.LEFT, 3);
-      //t.move(3);
-      //t.rotate(Direction.EAST, Rotation.RIGHT, 2);
-      //t.move(3);
-      
-      t.turtleStats();
-      System.out.println(p.toString());
-      
-
+      //Read from System.in and output to System.out
+      tp.process(System.in,System.out);
       
       
-      //Test cases
-      //ENABLE ASSERTIONS
-      //TestCases.Test.containsTest(p);
       
-      
+     
     }
 }

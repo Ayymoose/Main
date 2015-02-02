@@ -12,7 +12,7 @@ public class Turtle {
   private char brush;
   
   //' ' is the "empty" character here 
-  private char charRemaining = ' '; 
+  //private char charRemaining = ' '; 
   
   //Because of the damn (0,0) in the bottom left corner 
   private final int yOffset;
@@ -78,33 +78,21 @@ public class Turtle {
   public void draw() {
     if (penState == Pen.DOWN) {
       //Don't forget the remaining character
-      charRemaining = brush;
+    //  charRemaining = brush;
       
       //Draw the character
       paper.write(position.getX(),yOffset  - position.getY(), brush);
     }
   }
   
-  
-  /*
-   * 
-   * MOVING RIGHT: paper.getWidth() - position.getX() - 1;
-   * MOVING LEFT: 
-   * MOVING UP:
-   * MOVING DOWN
-   * 
-   */
-  
-  
   //Move steps steps in the current direction
+  //CLEAN UP LATER
   public void move(int steps) {
     
     int turtleSteps,stepsMax;
     int currentX = position.getX();
     int currentY = position.getY();
     int dx,dy;
-    boolean runout = false;
-    
     
     //Erase the turtle
     paper.write(position.getX(), yOffset - position.getY(), '.');
@@ -136,10 +124,9 @@ public class Turtle {
         dx = paper.getWidth() - position.getX() - 1;
         dy = paper.getHeight() - position.getY() - 1;
 
-        for (int i=0; i<steps && !runout; i++) {
+        for (int i=0; i<steps && !(dx <= 0 || dy <=0); i++) {
           dx--; 
           dy--;
-          runout = (dx <= 0 || dy <=0 ? true : false);
           position.update(position.getX() + 1,position.getY() + 1);
           draw();
         }
@@ -163,14 +150,13 @@ public class Turtle {
         
         //Available x and y left
         dx = paper.getWidth() - position.getX() - 1;
-        dy = position.getY() - 1;
+        dy = position.getY();
 
         System.out.println("dx: " + dx + "dy: " + dy);
         
-        for (int i=0; i<steps && !runout; i++) {
+        for (int i=0; i<steps && !(dx <= 0 || dy <=0); i++) {
           dx--;
           dy--;
-          runout = (dx <= 0 || dy <=0 ? true : false);
           position.update(position.getX() + 1,position.getY() - 1);
           draw();
         }
@@ -200,12 +186,9 @@ public class Turtle {
         dx = position.getX();
         dy = position.getY();
         
-        
-        
-        for (int i=0; i<steps && !runout; i++) {
+        for (int i=0; i<steps && !(dx <= 0 || dy <=0); i++) {
           dx--;
           dy--;
-          runout = (dx <= 0 || dy <=0 ? true : false);
           position.update(position.getX() - 1,position.getY() - 1);
           draw();
         }
@@ -228,15 +211,14 @@ public class Turtle {
       default: //NORTH_WEST
 
         //Available x and y left
-        dx = position.getX() - 1;
+        dx = position.getX();
         dy = paper.getHeight() - position.getY() - 1;
         
         //System.out.println("dx : " + dx + " dy :" + dy);
         
-        for (int i=0; i<steps && !runout; i++) {
+        for (int i=0; i<steps && !(dx <= 0 || dy <=0); i++) {
           dx--;
           dy--;
-          runout = (dx <= 0 || dy <=0 ? true : false);
           position.update(position.getX() - 1,position.getY() + 1);
           draw();
         }
@@ -250,4 +232,5 @@ public class Turtle {
     
     
   }
+
 }

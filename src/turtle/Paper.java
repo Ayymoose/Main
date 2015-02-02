@@ -18,7 +18,7 @@ public class Paper {
     //Initialise with blank spaces
     for (int x=0; x<rows; x++) {
       for (int y=0; y<cols; y++) {
-        paper[x][y] = '.';
+        paper[x][y] = '.'; //Initiliase to spaces default
       }
     }
   }
