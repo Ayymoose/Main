@@ -2,7 +2,13 @@ package turtle;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+
+import util.Direction;
+import util.Pen;
+import util.Rotation;
 
 public class TurtleInterpreter {
   
@@ -14,17 +20,27 @@ public class TurtleInterpreter {
      keeping track of the current paper, and knowing where to read input from and to send output to.
    */
   
+  //(Name,Turtle)
+  private final Map<String,Turtle> turtles = new HashMap<String, Turtle>();
+  private Paper currentPaper = null;
+  
   //Processes input from an InputStream and writes the output to an OutputStream out
   public void process(InputStream in,PrintStream out) {
     
     //Default delimiter is ' ' (Space)
-    Scanner scanner = new Scanner(in);
-    Parser p = new Parser(scanner);
+    Parser parser = new Parser(new Scanner(in));
+    
+    //Turtle details
+    Turtle currentTurtle = null;
+    String turtleName = null;
+    
+    
+    //
    
     //Get the commands to call the appropriate methods
-    String[] cmds = p.parse();
+    String[] cmds = parser.parse();
     
-    //Don't process and garbage
+    //Don't process garbage
     if (cmds != null) {
     
     switch (cmds[0]) {
@@ -33,34 +49,91 @@ public class TurtleInterpreter {
         int width = Integer.parseInt(cmds[1]);
         int height = Integer.parseInt(cmds[2]);
         Paper paper = new Paper(width,height);
-        out.println(paper.toString());
-        
+        currentPaper = paper;
+
         break;
       case "new":
+
+        //What to do with this now?
+      //type for now will be "normal" (assumed!)
+        String type = cmds[1];
+        
+        Coordinate position = new Coordinate(Integer.parseInt(cmds[3]),Integer.parseInt(cmds[4]));
+        Turtle turtle = new Turtle(position,Direction.NORTH,Pen.UP,currentPaper);
+        
+        turtleName = cmds[2];
+        
+        //Append the turtle to the hashmap
+        turtles.put(turtleName,turtle);
+        turtles.get(turtleName).changeBrush('*');
         break;
       case "pen":
+        //pen name state
+        //Untested
       
+        turtleName = cmds[1];
+        
+        //Check if there is a turtle called name
+        if (turtles.containsKey(turtleName)) {
+          
+          currentTurtle = turtles.get(turtleName);
+          String state = cmds[2];
+          
+          switch (state) {
+            case "up":
+              currentTurtle.changePen(Pen.UP);
+              break;
+            case "down":
+              currentTurtle.changePen(Pen.DOWN);
+              break;
+            default:
+              currentTurtle.changeBrush(state.charAt(0));
+              //Some single non blank character
+              break;
+          }
+        } else {
+          System.err.println("No such turtle with name '" + turtleName + "' exists");
+        }
         break;
       case "move":
+        //move name distance
+        turtleName = cmds[1];
+        int distance = Integer.parseInt(cmds[2]);
+        
+        //Do we have a turtle name turtleName already?
+        if (turtles.containsKey(turtleName)) {
+          
+          //Move the turtle
+          currentTurtle = turtles.get(turtleName);
+          currentTurtle.move(distance);
+          
+        } else {
+          System.err.println("No such turtle with name '" + turtleName + "' exists");
+        }
         break;
       case "right":
+      case "left":
+        
+        int angle = Integer.parseInt(cmds[2]);
+        turtleName = cmds[1];
+        currentTurtle = turtles.get(turtleName);
+
+        if (turtles.containsKey(turtleName)) {
+          //Rotate the turtle
+          Rotation rotation = ("left".equals(cmds[0]) ? Rotation.LEFT : Rotation.RIGHT);
+          currentTurtle.rotate(Direction.getDirectionFromAngle(angle), rotation, 1);
+        } else {
+          System.err.println("No such turtle with name '" + turtleName + "' exists");
+        }
         break;
       default:
         //show
-        
+        out.println(currentPaper.toString());
         break;
-        
     }
-    
     }
-    
-  
-    
-
     
   }
-  
-  
   
   /*
    * 

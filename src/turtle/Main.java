@@ -28,8 +28,12 @@ public class Main {
       
       TurtleInterpreter tp = new TurtleInterpreter();
       
+      while (true) {
+      
       //Read from System.in and output to System.out
       tp.process(System.in,System.out);
+      
+      }
       
       
       

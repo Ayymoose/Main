@@ -17,6 +17,28 @@ public enum Direction {
     this.angle = angle;
   }
   
+  //Overload without duplicating the code?
+  public static Direction getDirectionFromAngle(int angle) {
+    switch (angle) {
+      case 360:
+        return NORTH;
+      case 45:
+        return NORTH_EAST;
+      case 90:
+        return EAST;
+      case 135:
+        return SOUTH_EAST;
+      case 180:
+        return SOUTH;
+      case 225:
+        return SOUTH_WEST;
+      case 270:
+        return WEST;
+      default:
+        return NORTH_WEST;
+  }
+}
+  
   public Direction getDirection() {
     switch (angle) {
       case 360:
