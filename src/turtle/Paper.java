@@ -4,7 +4,8 @@ public class Paper {
   
   private int rows;
   private int cols;
-  private char[][] paper; //Initially blank
+  private char[][] paper;
+  private final char fillChar = '.';
   
   //Constructor
   public Paper(int width,int height) {
@@ -18,12 +19,10 @@ public class Paper {
     //Initialise with blank spaces
     for (int x=0; x<rows; x++) {
       for (int y=0; y<cols; y++) {
-        paper[x][y] = '.'; //Initiliase to spaces default
+        paper[x][y] = fillChar;
       }
     }
   }
-  
-  //Methods
   
   //Return width of paper
   public int getWidth() {
@@ -57,7 +56,6 @@ public class Paper {
   }
   
   
-  //Cannot overload without a weird display problem?
   
   public String toString() {
     StringBuilder sb = new StringBuilder();

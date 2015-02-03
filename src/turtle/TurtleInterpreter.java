@@ -12,6 +12,16 @@ import util.Rotation;
 
 public class TurtleInterpreter {
   
+  
+  
+  /*
+   * Bug list:
+   * 1. Rotation doesn't work properly
+   * 2. Parsing code is a fucking mess
+   * 3. Must not allow spaces as names
+   * 
+   */
+  
   /*
      The interpreter part of your program should not see the tokens (and certainly never the raw input). 
      Instead it should be told what methods to execute and what values those methods parameters have.
@@ -59,7 +69,7 @@ public class TurtleInterpreter {
         String type = cmds[1];
         
         Coordinate position = new Coordinate(Integer.parseInt(cmds[3]),Integer.parseInt(cmds[4]));
-        Turtle turtle = new Turtle(position,Direction.NORTH,Pen.UP,currentPaper);
+        Turtle turtle = new Turtle(position,Direction.SOUTH_WEST,Pen.UP,currentPaper);
         
         turtleName = cmds[2];
         
@@ -120,8 +130,12 @@ public class TurtleInterpreter {
 
         if (turtles.containsKey(turtleName)) {
           //Rotate the turtle
-          Rotation rotation = ("left".equals(cmds[0]) ? Rotation.LEFT : Rotation.RIGHT);
-          currentTurtle.rotate(Direction.getDirectionFromAngle(angle), rotation, 1);
+          if (angle != 0 && angle % 45 == 0) {
+            Rotation rotation = ("left".equals(cmds[0]) ? Rotation.LEFT : Rotation.RIGHT);
+            currentTurtle.rotate(Direction.getDirectionFromAngle(angle), rotation, 1);
+          } else {
+            System.err.println("Incorect angle specified '" + angle + "'");
+          }
         } else {
           System.err.println("No such turtle with name '" + turtleName + "' exists");
         }

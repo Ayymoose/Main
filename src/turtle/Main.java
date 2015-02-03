@@ -22,9 +22,7 @@ public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
       
-      //Now
-      //input is from command line
-      //output is via command line
+
       
       TurtleInterpreter tp = new TurtleInterpreter();
       

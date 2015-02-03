@@ -10,6 +10,8 @@ public enum Direction {
   WEST(270),//270
   NORTH_WEST(305);//305
 
+  //Redo this damn enum
+  
   
   private int angle;
   

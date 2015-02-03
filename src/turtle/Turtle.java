@@ -11,11 +11,9 @@ public class Turtle {
   private Paper paper;
   private char brush;
   
-  //' ' is the "empty" character here 
-  //private char charRemaining = ' '; 
-  
-  //Because of the damn (0,0) in the bottom left corner 
+  //(0,0) is the bottom left corner of the paper
   private final int yOffset;
+  private final char fillChar = '.';
 
   //Constructor
   public Turtle(Coordinate position,Direction direction,Pen penState,Paper paper) {
@@ -32,16 +30,11 @@ public class Turtle {
     this.paper.write(position.getX(), yOffset - position.getY(), '@');
   }
   
-  //Needed?
-  public Coordinate turtlePosition() {
-    return position;
-  }
-  
   public Direction turtleDirection() {
     return direction;
   }
-  //
   
+  //Debugging
   public void turtleStats() {
     System.out.println("");
     System.out.println("Turtle is @" + position);
@@ -50,9 +43,6 @@ public class Turtle {
     System.out.println("Brush is " + (char)brush);
     System.out.println("");
   } 
-  
-  
-  //
   
   //Change the state of the pen
   public void changePen(Pen penState) {
@@ -65,6 +55,7 @@ public class Turtle {
   }
   
   //Rotates the direction by rotation n times
+  //Not working
   public void rotate(Direction direction,Rotation rotation,int n) {
     //Left off @17:53
     //Left off @17:54 (the next day)
@@ -77,25 +68,24 @@ public class Turtle {
   //Draws if the pen is DOWN with the current brush
   public void draw() {
     if (penState == Pen.DOWN) {
-      //Don't forget the remaining character
-    //  charRemaining = brush;
-      
       //Draw the character
       paper.write(position.getX(),yOffset  - position.getY(), brush);
     }
   }
   
   //Move steps steps in the current direction
-  //CLEAN UP LATER
   public void move(int steps) {
     
-    int turtleSteps,stepsMax;
+    int turtleSteps,stepsMax=0;
     int currentX = position.getX();
     int currentY = position.getY();
-    int dx,dy;
+    int dx=0,dy=0;
+    int stepX = 0,stepY = 0;
+    boolean canMove = true;
+    boolean diagonal = false;
     
     //Erase the turtle
-    paper.write(position.getX(), yOffset - position.getY(), '.');
+    paper.write(position.getX(), yOffset - position.getY(), fillChar);
     
     //Write the remaining character if there is one
     if (brush != ' ' && penState == Pen.DOWN) {
@@ -104,133 +94,88 @@ public class Turtle {
     
     switch (direction) {
       case NORTH:
-        
-        //Calculate the available steps remaining
-        stepsMax = paper.getHeight() - currentY;
-        //Always guaranteed to be within the paper dimensions
-        turtleSteps = (steps < stepsMax ? currentY+steps : currentY+stepsMax-1);
-        
-        //Move and then draw and when the turtle stops with the pen DOWN there is a character underneath
-        for (int i=currentY; i<turtleSteps; i++) {
-          position.update(position.getX(),position.getY() + 1);
-          draw();
-        }
-        
-        break;
-        
-      case NORTH_EAST:
-        
-        //Available x and y left
-        dx = paper.getWidth() - position.getX() - 1;
-        dy = paper.getHeight() - position.getY() - 1;
-
-        for (int i=0; i<steps && !(dx <= 0 || dy <=0); i++) {
-          dx--; 
-          dy--;
-          position.update(position.getX() + 1,position.getY() + 1);
-          draw();
-        }
-        
-        break;
       case EAST:
-        
-        //Calculate the available steps remaining
-        stepsMax = paper.getWidth() - currentX;
-        //Always guaranteed to be within the paper dimensions
-        turtleSteps = (steps < stepsMax ? currentX+steps : currentX+stepsMax-1);
-        
-        //Move and then draw and when the turtle stops with the pen DOWN there is a character underneath
-        for (int i=currentX; i<turtleSteps; i++) {
-          position.update(position.getX() + 1,position.getY());
-          draw();
-        }
-
-        break;
-      case SOUTH_EAST:
-        
-        //Available x and y left
-        dx = paper.getWidth() - position.getX() - 1;
-        dy = position.getY();
-
-        System.out.println("dx: " + dx + "dy: " + dy);
-        
-        for (int i=0; i<steps && !(dx <= 0 || dy <=0); i++) {
-          dx--;
-          dy--;
-          position.update(position.getX() + 1,position.getY() - 1);
-          draw();
-        }
-        
-        
-        break;
       case SOUTH:
+      case WEST:
+      case NORTH_EAST:
+      case NORTH_WEST:
+      case SOUTH_EAST:
+      case SOUTH_WEST:
+      
+        switch (direction) {
+          case NORTH:
+            stepX = 1;
+            stepsMax = paper.getHeight() - currentY;
+            break;
+          case EAST:
+            stepX = 1;
+            stepsMax = paper.getWidth() - currentX;
+            break;
+          case SOUTH:
+            stepY = -1;
+            stepsMax = currentY+1;
+            break;
+          case WEST:
+            stepX = -1;
+            stepsMax = currentX+1;
+            break;
+          case NORTH_EAST:
+            dx = paper.getWidth() - position.getX() - 1;
+            dy = paper.getHeight() - position.getY() - 1;
+            stepsMax = Math.min(dx, dy);
+            stepX = 1;
+            stepY = 1;
+            diagonal = true;
+            break;
+          case SOUTH_EAST:
+            stepX = 1;
+            stepY = -1;
+            dx = paper.getWidth() - position.getX() - 1;
+            dy = position.getY();
+            stepsMax = Math.min(dx, dy);
+            diagonal = true;
+            break;
+          case SOUTH_WEST:
+            stepX = -1;
+            stepY = -1;
+            dx = position.getX();
+            dy = position.getY();
+            stepsMax = Math.min(dx, dy);
+            diagonal = true;
+            break;
+          default: //NORTH_WEST
+            stepX = -1;
+            stepY = 1;
+            dx = position.getX();
+            dy = paper.getHeight() - position.getY() - 1;
+            stepsMax = Math.min(dx, dy);
+            diagonal = true;
+            break;
+        }
         
-        //Calculate the available steps remaining
-        stepsMax = currentY;
         //Always guaranteed to be within the paper dimensions
-        turtleSteps = (steps < stepsMax ? steps : currentY);
-        
+        turtleSteps = (steps < stepsMax ? steps : stepsMax-1);
         //System.out.println(turtleSteps);
         
-        //Move and then draw and when the turtle stops with the pen DOWN there is a character underneath
-        for (int i=0; i<turtleSteps; i++) {
-          position.update(position.getX(),position.getY() - 1);
-          draw();
+        if (diagonal) {
+          canMove = (!(dx <= 0 || dy <=0));
+          turtleSteps++;
         }
-        
-        
-        break;
-      case SOUTH_WEST:
-        
-        //Available x and y left
-        dx = position.getX();
-        dy = position.getY();
-        
-        for (int i=0; i<steps && !(dx <= 0 || dy <=0); i++) {
-          dx--;
-          dy--;
-          position.update(position.getX() - 1,position.getY() - 1);
-          draw();
-        }
-        
-        break;
-      case WEST:
-        
-        //Calculate the available steps remaining
-        stepsMax = currentX;
-        //Always guaranteed to be within the paper dimensions
-        turtleSteps = (steps < stepsMax ? steps : currentX);
         
         //Move and then draw and when the turtle stops with the pen DOWN there is a character underneath
-        for (int i=0; i<turtleSteps; i++) {
-          position.update(position.getX() - 1,position.getY());
+        for (int i=0; i<turtleSteps && canMove; i++) {
+          position.update(position.getX() + stepX,position.getY() + stepY);
           draw();
+          if (diagonal) {
+            canMove = (!(dx <= 0 || dy <=0));
+            dx--;
+            dy--;
+          }
         }
-        
-        break;
-      default: //NORTH_WEST
-
-        //Available x and y left
-        dx = position.getX();
-        dy = paper.getHeight() - position.getY() - 1;
-        
-        //System.out.println("dx : " + dx + " dy :" + dy);
-        
-        for (int i=0; i<steps && !(dx <= 0 || dy <=0); i++) {
-          dx--;
-          dy--;
-          position.update(position.getX() - 1,position.getY() + 1);
-          draw();
-        }
-
         break;
     }
     //Draw and remember that there is a character at the turtle's position IF the pen is DOWN
     paper.write(position.getX(), yOffset - position.getY(), '@');
-    
-   
-    
-    
   }
 
 }
