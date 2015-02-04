@@ -10,7 +10,7 @@ public enum Direction {
   WEST(270),//270
   NORTH_WEST(305);//305
 
-  //Redo this damn enum
+  //This code makes me cringe
   
   
   private int angle;
@@ -124,3 +124,10 @@ public enum Direction {
 
 }
 
+
+/*
+ * 
+ * Direction d = new Direction(Direction.NORTH_EAST) (45)
+ * d.rotate(Rotation.RIGHT) == EAST
+ * 
+ */

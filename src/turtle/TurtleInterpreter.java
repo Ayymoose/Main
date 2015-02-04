@@ -1,14 +1,13 @@
 package turtle;
 
+import interpreter.Lexer;
+import interpreter.Parser;
+
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
-import util.Direction;
-import util.Pen;
-import util.Rotation;
 
 public class TurtleInterpreter {
   
@@ -17,8 +16,7 @@ public class TurtleInterpreter {
   /*
    * Bug list:
    * 1. Rotation doesn't work properly
-   * 2. Parsing code is a fucking mess
-   * 3. Must not allow spaces as names
+   * 2. Must not allow spaces as names
    * 
    */
   
@@ -34,21 +32,36 @@ public class TurtleInterpreter {
   private final Map<String,Turtle> turtles = new HashMap<String, Turtle>();
   private Paper currentPaper = null;
   
+  
+ 
+  
   //Processes input from an InputStream and writes the output to an OutputStream out
   public void process(InputStream in,PrintStream out) {
+  
+   
     
     //Default delimiter is ' ' (Space)
-    Parser parser = new Parser(new Scanner(in));
+    
+    //Lexically analyse the input and split into tokens
+    Lexer lexer = new Lexer(new Scanner(in));   
+    String[] tokens = lexer.tokenise(" ");
+    
+    Parser parser = new Parser();       
+    parser.parser(tokens);
+    
+    //Pass the tokens to our Parser 
+    
+    //for (String s : tokens) {
+      //out.println(s);
+    //}
+    
+
+    
+    /*
     
     //Turtle details
     Turtle currentTurtle = null;
     String turtleName = null;
-    
-    
-    //
-   
-    //Get the commands to call the appropriate methods
-    String[] cmds = parser.parse();
     
     //Don't process garbage
     if (cmds != null) {
@@ -146,7 +159,7 @@ public class TurtleInterpreter {
         break;
     }
     }
-    
+    */
   }
   
   /*
