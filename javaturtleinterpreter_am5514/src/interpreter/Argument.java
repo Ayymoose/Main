@@ -6,9 +6,6 @@ public enum Argument {
   STRING,
   KEYWORD;
   
-  //ignore
-  
-
   //Checks if the argument numbers match ; a bit silly and poorly design since the function name should be passed in aswell.
   public static boolean argumentNumberCheck(int expectedArguments,int actualArguments) {
     return expectedArguments == actualArguments;
