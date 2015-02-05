@@ -12,7 +12,7 @@ public class Lexer {
       this.scanner = scanner;
     }
     
-    //Gets the number of tokens in the current string
+    //Gets the number of tokens in the current string 
     private int tokenCount(String string,String delimiter) {
      return string.split(delimiter).length;
     }

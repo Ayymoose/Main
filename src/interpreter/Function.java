@@ -1,62 +1,73 @@
 package interpreter;
 
+import interpreter.exceptions.InsufficientArgumentException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Arrays;
 
 public class Function {
   
-  //Why can't I make the methods static and call functionMap in them?
-  private final Map<String,Integer> functionMap = new HashMap<String,Integer>();
+  public String toString() {
+    return "FUNCTION NAME '" + functionName + "' ARGUMENTS: " + Arrays.toString(arguments);
+  }
+  
+  private String functionName;
+  private String[] arguments;
+  
+  public Function(String functionName,String[] arguments) {
+    this.functionName = functionName;
+    this.arguments = arguments;
+  }
+  
+  //Maps function names to arguments
+  private final Map<String,Argument[]> functionMap = new HashMap<String,Argument[]>();
+   
+  //Defines a new function called functionName with parameter types given in arguments
+  public void createFunction(String functionName,Argument[] arguments) {
+    functionMap.put(functionName, arguments);
+  }
   
   //Constructor
   public Function() {
-    mapFunctions();
-  }
-
-  //Maps function names to argument names
-  private void mapFunctions() {
-    
-    /*
-     * In our turtle interpreter language we have the following commands
-     * paper width height
-     * new type name x y 
-     * pen name state
-     * move name distance
-     * right name angle
-     * left name angle
-     */
-    
-    //These are NOT magic numbers! Please don't mark me down for this :)
-    //Mapping of the function name to the number of arguments its expected to receive
-    functionMap.put("paper",2);
-    functionMap.put("new",4);
-    functionMap.put("pen",2);
-    functionMap.put("move",2);
-    functionMap.put("right",2);
-    functionMap.put("left",2);
-  }
-
-  //Returns the number of arguments a function has
-  public int functionArguments(String functionName) {
-    return functionMap.get(functionName);
+    createFunction("paper",new Argument[] {Argument.INTEGER,Argument.INTEGER});
+    createFunction("new",new Argument[] {Argument.KEYWORD,Argument.STRING,Argument.INTEGER,Argument.INTEGER});
+    createFunction("pen",new Argument[] {Argument.STRING,Argument.KEYWORD});
+    createFunction("move",new Argument[] {Argument.STRING,Argument.INTEGER});
+    createFunction("left",new Argument[] {Argument.STRING,Argument.INTEGER});
+    createFunction("right",new Argument[] {Argument.STRING,Argument.INTEGER});
   }
   
-  //Returns the arguments for the function
+  //Return the function name
+  public String getFunctionName() {
+    return functionName;
+  }
+  
+  //Returns the number of arguments a function has
+  public int functionArgumentCount(String functionName) {
+    return functionMap.get(functionName).length;
+  }
+  
+  //Returns the arguments for the function as Argument[]
   public Argument[] getFunctionArguments(String[] tokens) {
     //Assuming the first argument is the function name
     return stringsToArguments(Arrays.copyOfRange(tokens, 1, tokens.length));
   }
   
+  //Returns the arguments for the function
+  public String[] getFunctionArgumentsAsString(String[] tokens) {
+    //Assuming the first argument is the function name
+    return Arrays.copyOfRange(tokens, 1, tokens.length);
+  }
   
   //Converts a string to its corresponding argument
   public Argument stringToArgument(String string) {
     if (isLiteral(string)) {
-      //System.out.println(string + " is string");
       return Argument.STRING;
-    } else {
-      //System.out.println(string + " is integer");
+    } else if (isInteger(string)){
       return Argument.INTEGER;
+    } else {
+      return Argument.KEYWORD;
     }
   }
   
@@ -67,44 +78,49 @@ public class Function {
     }
     return args;
   }
-  //
   
-  //Returns true iff we can evaluate the function with the given arguments
-  public boolean canEvaluate(String functionName,Argument[] arguments) {
-  
-    int numberOfArguments = functionArguments(functionName);
-    int expectedArguments = functionMap.get(functionName);
-    
-    //Match number of arguments , throw argument mismatch exception
-    Argument.argumentNumberCheck(numberOfArguments,expectedArguments);
-    
-    switch (functionName) {
-      case "paper":
-           
-        //Expecting two integers
-        Argument[] paperArguments = {Argument.INTEGER,Argument.INTEGER};
-        
-        //Throw illegal argument type exception
-        Argument.argumentTypeCheck(paperArguments, arguments);
-        
-        /*
-         * 
-         * WHERE I LEFT OFF @ 18:38
-         * Doesn't do anything yet since I don't have any exception handling implemented
-         * 
-         */
-        
-      break;
-      
-      
-      
-      default:
-        
+  //Returns true iff the number of arguments matches that of the function functionName
+  public boolean argumentNumberCheck(String functionName,int arguments) throws InsufficientArgumentException {
+    boolean result = functionMap.get(functionName).length == arguments;
+    if (!result) {
+      throw new InsufficientArgumentException("Expecting " + functionMap.get(functionName).length + " argument(s) but only received " + arguments + " for function '" + functionName + "'");
     }
-    
-    
+    return result;
+  }
+  
+  //Returns true iff the arguments are exactly the same type as the function signature
+  public boolean argumentTypeCheck(String functionName,Argument[] arguments) throws IllegalArgumentException{
+    boolean result = Arrays.equals(functionMap.get(functionName), arguments);
+    if (!result) { 
+      throw new IllegalArgumentException("Arguments provided do not match the method signature for '" + functionName + "'");
+    }
+    return result;
+  }
+  
+  //Returns true iff we can evaluate the function functionName with the given arguments
+  public boolean canEvaluate(String functionName,Argument[] arguments)  {
+    try {
+      argumentNumberCheck(functionName,arguments.length);
+      argumentTypeCheck(functionName,arguments);
+    } catch (InsufficientArgumentException iae) {
+      System.err.println(iae.getMessage());
+      return false;
+    } catch (IllegalArgumentException iae) {
+      System.err.println(iae.getMessage());
+      return false;
+    }
     return true;
   }
+  
+  
+  //TODO: Implement
+  public void evalute(String functionNane,String[] arguments) {
+    
+    
+    
+  }
+  
+  
   
   //Return true iff the token is a function
   public boolean isFunction(String token) {
@@ -125,6 +141,8 @@ public class Function {
   public boolean isKeyword(String token) {
     switch (token) {
       case "normal":
+      //case "up":    //Might have to split these into types later on
+     // case "down":
         return true;
       default:
         return false;
@@ -142,4 +160,3 @@ public class Function {
   }
   
 }
-
