@@ -2,9 +2,10 @@ package interpreter;
 
 import interpreter.exceptions.InsufficientArgumentException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Arrays;
 
 public class Function {
   
@@ -22,20 +23,43 @@ public class Function {
   
   //Maps function names to arguments
   private final Map<String,Argument[]> functionMap = new HashMap<String,Argument[]>();
-   
+  //Contains keywords
+  private final ArrayList<String> keywords = new ArrayList<String> ();
+  //Types
+  private final ArrayList<String> types = new ArrayList<String> ();
+  
+  
   //Defines a new function called functionName with parameter types given in arguments
-  public void createFunction(String functionName,Argument[] arguments) {
+  public void defineFunction(String functionName,Argument[] arguments) {
     functionMap.put(functionName, arguments);
   }
   
+  public void defineKeyword(String keyword) {
+    keywords.add(keyword);
+  }
+  
+  public void defineType(String type) {
+    types.add(type);
+  }
+
   //Constructor
   public Function() {
-    createFunction("paper",new Argument[] {Argument.INTEGER,Argument.INTEGER});
-    createFunction("new",new Argument[] {Argument.KEYWORD,Argument.STRING,Argument.INTEGER,Argument.INTEGER});
-    createFunction("pen",new Argument[] {Argument.STRING,Argument.KEYWORD});
-    createFunction("move",new Argument[] {Argument.STRING,Argument.INTEGER});
-    createFunction("left",new Argument[] {Argument.STRING,Argument.INTEGER});
-    createFunction("right",new Argument[] {Argument.STRING,Argument.INTEGER});
+    defineFunction("paper",new Argument[] {Argument.INTEGER,Argument.INTEGER});
+    defineFunction("new",new Argument[] {Argument.KEYWORD,Argument.STRING,Argument.INTEGER,Argument.INTEGER});
+    defineFunction("pen",new Argument[] {Argument.STRING,Argument.KEYWORD});
+    defineFunction("move",new Argument[] {Argument.STRING,Argument.INTEGER});
+    defineFunction("left",new Argument[] {Argument.STRING,Argument.INTEGER});
+    defineFunction("right",new Argument[] {Argument.STRING,Argument.INTEGER});
+    defineFunction("show",new Argument[] {Argument.NO_ARGUMENT});
+    //
+    defineKeyword("normal");
+    defineKeyword("bouncy");
+    defineKeyword("reflecting");
+    defineKeyword("wrapping");
+    defineKeyword("continuous");
+    defineKeyword("cluster");
+    defineKeyword("up");
+    defineKeyword("down");
   }
   
   //Return the function name
@@ -44,14 +68,19 @@ public class Function {
   }
   
   //Returns the number of arguments a function has
-  public int functionArgumentCount(String functionName) {
-    return functionMap.get(functionName).length;
+  public int getNumberOfArguments(String functionName) {
+    
+    return (functionMap.get(functionName)[0] != Argument.NO_ARGUMENT ? functionMap.get(functionName).length : 0);
+    
+   // return functionMap.get(functionName).length;
   }
   
   //Returns the arguments for the function as Argument[]
   public Argument[] getFunctionArguments(String[] tokens) {
     //Assuming the first argument is the function name
-    return stringsToArguments(Arrays.copyOfRange(tokens, 1, tokens.length));
+    return (tokens.length == 1 ? new Argument[] {Argument.NO_ARGUMENT} : stringsToArguments(Arrays.copyOfRange(tokens, 1, tokens.length)));
+    
+    //return stringsToArguments(Arrays.copyOfRange(tokens, 1, tokens.length));
   }
   
   //Returns the arguments for the function
@@ -66,8 +95,10 @@ public class Function {
       return Argument.STRING;
     } else if (isInteger(string)){
       return Argument.INTEGER;
-    } else {
+    } else if (isKeyword(string)){
       return Argument.KEYWORD;
+    } else {
+      return Argument.NO_ARGUMENT;
     }
   }
   
@@ -81,15 +112,19 @@ public class Function {
   
   //Returns true iff the number of arguments matches that of the function functionName
   public boolean argumentNumberCheck(String functionName,int arguments) throws InsufficientArgumentException {
-    boolean result = functionMap.get(functionName).length == arguments;
+    boolean result = getNumberOfArguments(functionName) == arguments;
     if (!result) {
-      throw new InsufficientArgumentException("Expecting " + functionMap.get(functionName).length + " argument(s) but only received " + arguments + " for function '" + functionName + "'");
+      throw new InsufficientArgumentException("Expecting " + getNumberOfArguments(functionName) + " argument(s) but received " + arguments + " for function '" + functionName + "'");
     }
     return result;
   }
   
   //Returns true iff the arguments are exactly the same type as the function signature
   public boolean argumentTypeCheck(String functionName,Argument[] arguments) throws IllegalArgumentException{
+    
+    //System.out.println("Got " + Arrays.toString(functionMap.get(functionName)));
+    //System.out.println("Exp " +Arrays.toString(arguments));
+    
     boolean result = Arrays.equals(functionMap.get(functionName), arguments);
     if (!result) { 
       throw new IllegalArgumentException("Arguments provided do not match the method signature for '" + functionName + "'");
@@ -100,53 +135,30 @@ public class Function {
   //Returns true iff we can evaluate the function functionName with the given arguments
   public boolean canEvaluate(String functionName,Argument[] arguments)  {
     try {
-      argumentNumberCheck(functionName,arguments.length);
+      argumentNumberCheck(functionName,(arguments.length == 1 ? 0 : arguments.length));
       argumentTypeCheck(functionName,arguments);
     } catch (InsufficientArgumentException iae) {
       System.err.println(iae.getMessage());
+      System.exit(-1);
       return false;
     } catch (IllegalArgumentException iae) {
       System.err.println(iae.getMessage());
+      System.exit(-1);
       return false;
     }
     return true;
   }
   
-  
-  //TODO: Implement
-  public void evalute(String functionNane,String[] arguments) {
-    
-    
-    
-  }
-  
-  
-  
   //Return true iff the token is a function
   public boolean isFunction(String token) {
-    switch (token) {
-      case "paper":        
-      case "new":   
-      case "pen":
-      case "move":
-      case "right":
-      case "left":
-        return true;
-      default:
-        return false;
-    }
+    return functionMap.containsKey(token);
   }
   
   //Returns true iff the token is a keyword
+  //TODO: Fix
   public boolean isKeyword(String token) {
-    switch (token) {
-      case "normal":
-      //case "up":    //Might have to split these into types later on
-     // case "down":
-        return true;
-      default:
-        return false;
-    }
+  //A keyword can also be a non blank character
+    return keywords.contains(token) || token.matches("[^ ]");
   }
   
   //Returns true iff the token is an integer
@@ -159,4 +171,8 @@ public class Function {
     return !(isFunction(token) || isKeyword(token) || isInteger(token)) && token.length() > 0 ;
   }
   
+  //Returns true iff the token is a type
+  public boolean isType(String token) {
+    return types.contains(token);
+  }
 }

@@ -1,7 +1,7 @@
 package interpreter;
 
+import java.util.Arrays;
 import java.util.Scanner;
-
 
 public class Lexer {
 
@@ -13,13 +13,13 @@ public class Lexer {
     }
     
     //Gets the number of tokens in the current string 
-    private int tokenCount(String string,String delimiter) {
-     return string.split(delimiter).length;
+    private int tokenCount(String string) {
+     return string.split("\\s+").length;
     }
     
-    //Tokenises the input to give back a list of tokens to be passed to the parser
-    //Returns a list of tokens
-    public String[] tokenise(String delimiter) {
+    //Returns a list of tokens 
+    //TODO : Finish
+    public String[] tokenise() {
       
       String[] tokens = null;
       if (scanner != null) {
@@ -30,19 +30,53 @@ public class Lexer {
           String input = scanner.nextLine();
 
           //Get the total number of arguments passed in
-          int numberOfTokens = tokenCount(input,delimiter);
+          int numberOfTokens = tokenCount(input);
 
           if (numberOfTokens > 0) {
-            //Populate the array with whatever input we are fed
             tokens = new String[numberOfTokens];
-            //Easy tokenising by using split!
-            tokens = input.split(delimiter); 
-           
+
+            //Removes white space 
+            tokens = input.split("\\s+"); 
+
+            //System.out.println(Arrays.toString(tokens));
           }
           return tokens;
         }
+        
+        
+        
       }
       return null;
     }
-
+    
+/*
+    private String[] removeSpace(String[] strings) {
+      
+      int size = strings.length;
+      int count = 0;
+      
+      for(String string : strings) {
+        if (string.equals(" ")) {
+          count++;
+        }
+      }
+      
+      String[] newString = new String[size - count];
+      for (int i=0,j=0; i<size; i++) {
+        if (!strings[i].equals(" ")) {
+          newString[j] = strings[i];
+          j++;
+        } 
+        //{"test" , }
+        //{"test"," ","abc"," "}; 
+          
+        //?( )\w 
+        
+      }
+      
+      return newString;
+      
+    }*/
+    
+    
 }

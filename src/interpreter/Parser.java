@@ -4,43 +4,27 @@ import java.util.ArrayList;
 
 public class Parser {
   
-  //Default constructor
-  public Parser() {};
-  
   //Parses the tokens and returns true if it was successful
-  //TODO: Finish
-  public ArrayList<Function> parse(String[] tokens) {
+  public ArrayList<Function> parse(String[] tokens){ 
+    ArrayList<Function> functionList = new ArrayList<Function>();      
+    Function function = new Function();
     
-    //Expects a function first
-    if (tokens != null) {      
-      
-      Function function = new Function();
-      
-      ArrayList<Function> functionList = new ArrayList<Function>();
+    //Input expected
+    //function [argument1,argument2...argumentn]
+    
+    String functionName = tokens[0];
+    
+    //System.out.println(function.getNumberOfArguments(functionName));
 
-      for (String token : tokens) {
-        
-        if (function.isFunction(token)) {
-          if (function.canEvaluate(token, function.getFunctionArguments(tokens))) {
-            
-            functionList.add(new Function(token,function.getFunctionArgumentsAsString(tokens)));            
-
-          } else {
-            return null;
-          }
-        } else if (function.isKeyword(token)) {
-          System.err.println("Cannot evaluate KEYWORD '" + token + "'");
-        } else if (function.isInteger(token)) {
-          System.err.println("Cannot evaluate INTEGER '" + token + "'");
-        } else if (function.isLiteral(token)) {
-          System.err.println("Cannot evaluate LITERAL '" + token + "'");
-        } else {
-          System.err.println("Cannot evaluate garbage '" + token + "'");
-        }
-
+    if (function.isFunction(functionName)) {
+      //If the function can be evaluated then add it to the function list
+      if (function.canEvaluate(functionName, function.getFunctionArguments(tokens))) {
+        functionList.add(new Function(functionName,function.getFunctionArgumentsAsString(tokens)));            
       }
-      return functionList;
-    } 
-    return null;
+    }
+
+    
+    
+    return functionList; 
   }
 }

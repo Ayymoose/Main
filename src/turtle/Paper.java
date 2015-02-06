@@ -5,7 +5,7 @@ public class Paper {
   private int rows;
   private int cols;
   private char[][] paper;
-  private final char fillChar = '.';
+  private final char fillChar = ' ';
   
   //Constructor
   public Paper(int width,int height) {

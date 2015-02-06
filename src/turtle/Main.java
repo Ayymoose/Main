@@ -1,9 +1,15 @@
 package turtle;
 
+import interpreter.Lexer;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
+//import java.util.Arrays;
+//import java.util.Scanner;
 
 
 public class Main {
@@ -30,30 +36,47 @@ public class Main {
         output.
       */
       
+      //Function f = new Function();
+      //System.out.println(f.isKeyword("#"));
+      
+      //Lexer l = new Lexer(new Scanner(System.in));
+      
+     // String[] s = {"test"," ","abc"," "};
+      //System.out.println(Arrays.toString(l.removeSpace(s)));
+    /*
+      String s = "new bouncy  maeve 0 12";
+      String[] p = s.split("\\s+");
+      
+      System.out.println(Arrays.toString(p));
+      */
+      
       TurtleInterpreter turtleInterpreter = new TurtleInterpreter();
       
       int numberOfArguments = args.length;
       String inputFileName;
       String outputFileName;
       
-      
       switch (numberOfArguments) {
         case 0:
-          turtleInterpreter.process(System.in, System.out);
+          turtleInterpreter.updateStream(System.in, System.out);
           break;
         case 1:
           inputFileName = args[0];
-          turtleInterpreter.process(new FileInputStream(new File(inputFileName)), System.out);
+          turtleInterpreter.updateStream(new FileInputStream(inputFileName), System.out);
           break;
         case 2:
           inputFileName = args[0];
           outputFileName = args[1];
-          turtleInterpreter.process(new FileInputStream(new File(inputFileName)), new PrintStream(new File(outputFileName)));
+          turtleInterpreter.updateStream(new FileInputStream(inputFileName), new PrintStream(new File(outputFileName)));
           break;
         default:
           System.err.println("Garbage input received.");
+          System.exit(-1);
         break;    
       }
-
+      turtleInterpreter.process();
+      
+      
     }
+    
 }
