@@ -13,7 +13,7 @@ public class Turtle {
   
   //(0,0) is the bottom left corner of the paper
   private final int yOffset;
-  private final char fillChar = '.';
+  private final char fillChar = '*';
 
   //Constructor
   public Turtle(Coordinate position,Direction direction,Pen penState,Paper paper) {
@@ -21,6 +21,8 @@ public class Turtle {
     this.direction = direction;
     this.penState = penState;
     this.paper = paper;
+    
+    
     
     yOffset = paper.getHeight() - 1;
     
@@ -55,14 +57,16 @@ public class Turtle {
   }
   
   //Rotates the direction by rotation n times
-  //Not working
-  public void rotate(Direction direction,Rotation rotation,int n) {
-    //Left off @17:53
-    //Left off @17:54 (the next day)
-    //Started and finished @ 13:29! (the day after that!) 
+  public void rotate(int angle,Rotation rotation,int n) {
+    /*Direction d = direction;
     for (int i=0; i<n; i++) {
-      this.direction = direction.rotate(rotation);
+     d = direction.rotate(rotation);
     }
+    direction = d;*/
+    
+    direction = direction.rotate(rotation, angle);
+    
+    System.out.println(direction);
   }
   
   //Draws if the pen is DOWN with the current brush
@@ -74,6 +78,7 @@ public class Turtle {
   }
   
   //Move steps steps in the current direction
+  //TODO: Finish
   public void move(int steps) {
     
     int turtleSteps,stepsMax=0;
@@ -104,7 +109,7 @@ public class Turtle {
       
         switch (direction) {
           case NORTH:
-            stepX = 1;
+            stepY = 1;
             stepsMax = paper.getHeight() - currentY;
             break;
           case EAST:
@@ -154,13 +159,16 @@ public class Turtle {
         }
         
         //Always guaranteed to be within the paper dimensions
-        turtleSteps = (steps < stepsMax ? steps : stepsMax-1);
-        //System.out.println(turtleSteps);
+        turtleSteps = (steps < stepsMax ? steps : stepsMax-1);//
+       
         
         if (diagonal) {
           canMove = (!(dx <= 0 || dy <=0));
-          turtleSteps++;
+          turtleSteps = (turtleSteps == stepsMax-1 ? ++turtleSteps : turtleSteps);
         }
+        
+        //System.out.println(turtleSteps);
+        //System.out.println("dx: " + dx + " dy: " + dy);
         
         //Move and then draw and when the turtle stops with the pen DOWN there is a character underneath
         for (int i=0; i<turtleSteps && canMove; i++) {

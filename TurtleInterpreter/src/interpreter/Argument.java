@@ -7,6 +7,7 @@ public enum Argument {
   
   INTEGER,
   STRING,
-  KEYWORD;
+  KEYWORD,
+  NO_ARGUMENT;
   
 }

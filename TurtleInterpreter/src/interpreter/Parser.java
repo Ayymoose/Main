@@ -1,46 +1,30 @@
 package interpreter;
 
+import java.util.ArrayList;
+
 public class Parser {
   
-  //Default constructor
-  public Parser() {};
-  
-  //Parses tokens passed in
-  public void parser(String[] tokens) {
-    
-     
+  //Parses the tokens and returns true if it was successful
+  public ArrayList<Function> parse(String[] tokens){ 
+    ArrayList<Function> functionList = new ArrayList<Function>();      
     Function function = new Function();
     
-    for (String token : tokens) {
-      
-      if (function.isFunction(token)) {
-        
-        //Check if we can evaluate the function
-        //tokens is everything including the function name!
-        if (function.canEvaluate(token,function.getFunctionArguments(tokens))) {
-          
-          //We can evaluate the function
-          System.out.println("test OK");
+    //Input expected
+    //function [argument1,argument2...argumentn]
+    
+    String functionName = tokens[0];
+    
+    //System.out.println(function.getNumberOfArguments(functionName));
 
-        } else {
-          System.err.println("Garbage received");
-        }
-        
-        //System.out.println("'" + token + "' is a FUNCTION");
-      } else if (function.isKeyword(token)) {
-        //System.out.println("'" + token + "' is a KEYWORD");
-      } else if (function.isInteger(token)) {
-        //System.out.println("'" + token + "' is a INTEGER");
-      } else if (function.isLiteral(token)) {
-        //System.out.println("'" + token + "' is a LITERAL");
-      } else {
-        //System.out.println("'" + token + "' is GARBAGE");
+    if (function.isFunction(functionName)) {
+      //If the function can be evaluated then add it to the function list
+      if (function.canEvaluate(functionName, function.getFunctionArguments(tokens))) {
+        functionList.add(new Function(functionName,function.getFunctionArgumentsAsString(tokens)));            
       }
-      
-      
-      
-      
     }
-  }
 
+    
+    
+    return functionList; 
+  }
 }

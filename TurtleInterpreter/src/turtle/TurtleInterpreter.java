@@ -1,24 +1,23 @@
 package turtle;
 
+import interpreter.Function;
 import interpreter.Lexer;
 import interpreter.Parser;
+import interpreter.Token;
+import interpreter.exceptions.InsufficientArgumentException;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import util.Direction;
+import util.Pen;
+import util.Rotation;
+
 public class TurtleInterpreter {
-  
-  
-  
-  /*
-   * Bug list:
-   * 1. Rotation doesn't work properly
-   * 2. Must not allow spaces as names
-   * 
-   */
   
   /*
      The interpreter part of your program should not see the tokens (and certainly never the raw input). 
@@ -28,157 +27,153 @@ public class TurtleInterpreter {
      keeping track of the current paper, and knowing where to read input from and to send output to.
    */
   
-  //(Name,Turtle)
-  private final Map<String,Turtle> turtles = new HashMap<String, Turtle>();
+  private InputStream in;
+  private PrintStream out;
   private Paper currentPaper = null;
+  private String turtleName;
+  
+  //Constructor
+  public TurtleInterpreter(InputStream in,PrintStream out) {
+    this.in = in;
+    this.out = out;
+  }
+  
+  //Default
+  public TurtleInterpreter() {};
   
   
- 
+  public void updateStream(InputStream in,PrintStream out) {
+    this.in = in;
+    this.out = out;
+  }
   
-  //Processes input from an InputStream and writes the output to an OutputStream out
-  public void process(InputStream in,PrintStream out) {
+  private final Map<String,Turtle> turtles = new HashMap<String, Turtle>();
+
+
+  public void evaluate(String functionName,String[] arguments) {
+    
+    //paper ["10","10"]
+    //new ["normal","turtle1","3","4"]
+    
   
-    //Lexically analyse the input and split into tokens
-    Lexer lexer = new Lexer(new Scanner(in));   
-    String[] tokens = lexer.tokenise(" ");
     
-    Parser parser = new Parser();       
-    parser.parser(tokens);
+
+  
     
-    /*
+    //This is exactly what I was trying to avoid but I can't think of a nice way
+    //to implement this sort of thing
+    //"Hardcoding" arguments
+    //What is the correct way to handle this sort of thing?
     
-    //Turtle details
-    Turtle currentTurtle = null;
-    String turtleName = null;
-    
-    //Don't process garbage
-    if (cmds != null) {
-    
-    switch (cmds[0]) {
+    //User defined implementation goes here
+    switch (functionName) {
       case "paper":
-        
-        int width = Integer.parseInt(cmds[1]);
-        int height = Integer.parseInt(cmds[2]);
-        Paper paper = new Paper(width,height);
-        currentPaper = paper;
-
-        break;
+        int width = Integer.parseInt(arguments[0]);
+        int height = Integer.parseInt(arguments[1]);
+        currentPaper = new Paper(width,height);
+      break;
+      
       case "new":
-
-        //What to do with this now?
-      //type for now will be "normal" (assumed!)
-        String type = cmds[1];
         
-        Coordinate position = new Coordinate(Integer.parseInt(cmds[3]),Integer.parseInt(cmds[4]));
-        Turtle turtle = new Turtle(position,Direction.SOUTH_WEST,Pen.UP,currentPaper);
+        String type = arguments[0];
+        turtleName = arguments[1];
+        int x = Integer.parseInt(arguments[2]);
+        int y = Integer.parseInt(arguments[3]);
+        Coordinate position = new Coordinate(x,y);  
         
-        turtleName = cmds[2];
+        Turtle turtle = new Turtle(position,Direction.NORTH,Pen.UP,currentPaper);
+        turtles.put(turtleName, turtle);
+        turtle.changeBrush('*');
         
-        //Append the turtle to the hashmap
-        turtles.put(turtleName,turtle);
-        turtles.get(turtleName).changeBrush('*');
+        /*
+        switch (type) {
+          case "normal":
+             
+            break;
+            
+          default:
+            //
+            break;
+        }*/
+        
         break;
       case "pen":
-        //pen name state
-        //Untested
-      
-        turtleName = cmds[1];
         
-        //Check if there is a turtle called name
-        if (turtles.containsKey(turtleName)) {
-          
-          currentTurtle = turtles.get(turtleName);
-          String state = cmds[2];
-          
-          switch (state) {
-            case "up":
-              currentTurtle.changePen(Pen.UP);
-              break;
-            case "down":
-              currentTurtle.changePen(Pen.DOWN);
-              break;
-            default:
-              currentTurtle.changeBrush(state.charAt(0));
-              //Some single non blank character
-              break;
-          }
-        } else {
-          System.err.println("No such turtle with name '" + turtleName + "' exists");
+        turtleName = arguments[0];
+        String state = arguments[1];
+        
+        switch (state) {
+        case "up":
+          turtles.get(turtleName).changePen(Pen.UP);
+          break;
+        case "down":
+          turtles.get(turtleName).changePen(Pen.DOWN);
+          break;  
+        default:
+          turtles.get(turtleName).changeBrush(state.charAt(0));
+          break;
         }
+        
         break;
       case "move":
-        //move name distance
-        turtleName = cmds[1];
-        int distance = Integer.parseInt(cmds[2]);
         
-        //Do we have a turtle name turtleName already?
-        if (turtles.containsKey(turtleName)) {
-          
-          //Move the turtle
-          currentTurtle = turtles.get(turtleName);
-          currentTurtle.move(distance);
-          
-        } else {
-          System.err.println("No such turtle with name '" + turtleName + "' exists");
-        }
+        turtleName = arguments[0];
+        int distance = Integer.parseInt(arguments[1]);
+        turtles.get(turtleName).move(distance);
         break;
+        
       case "right":
       case "left":
         
-        int angle = Integer.parseInt(cmds[2]);
-        turtleName = cmds[1];
-        currentTurtle = turtles.get(turtleName);
-
-        if (turtles.containsKey(turtleName)) {
-          //Rotate the turtle
-          if (angle != 0 && angle % 45 == 0) {
-            Rotation rotation = ("left".equals(cmds[0]) ? Rotation.LEFT : Rotation.RIGHT);
-            currentTurtle.rotate(Direction.getDirectionFromAngle(angle), rotation, 1);
-          } else {
-            System.err.println("Incorect angle specified '" + angle + "'");
-          }
-        } else {
-          System.err.println("No such turtle with name '" + turtleName + "' exists");
-        }
+        turtleName = arguments[0];
+        int angle = Integer.parseInt(arguments[1]); // angle % 45 = 0 and angle != 0
+ 
+        Rotation rotation = (functionName.equals("left") ? Rotation.LEFT : Rotation.RIGHT);
+        //System.out.printf("rotation=%S angle=%d angle/45=%d",rotation,angle,angle/45);
+        //System.out.println();
+        turtles.get(turtleName).rotate(angle, rotation, 0);
+        
+        
         break;
-      default:
-        //show
+      case "show":
+        //If currentPaper is not null
         out.println(currentPaper.toString());
         break;
+      default: 
+        //
+        break;
+        
     }
-    }
-    */
+    
+
+    
   }
-   
-  /*
-   * 
-   * 1. paper width height which sets the paper size to width characters wide, and height characters
-     high. Additionally, all locations should be blanked and all turtles removed.
-     
-     2. new type name x y which creates a new turtle. For Part 1, you can assume type will always
-        be the string value normal (but see §2.2).
-        The turtle should be named name, and all future commands will be directed to that turtle
-        using this name. The turtle will be placed at position (x,y) on the paper, where position
-        (0,0) is the bottom left corner. The turtle will have its pen up, with the brush character ‘*’
-        and be facing North.
+  
+  //Processes input from an InputStream and writes the output to an PrintStream out
+  public void process() {
+  
+    //Lexically analyse the input and split into tokens
+    Lexer lexer = new Lexer(new Scanner(in));  
+    String[] tokens;
+    Parser parser = new Parser();   
 
-        Java Turtle Graphics Part 1: Implementing the Basics
-     3. pen name state which changes the state of the pen held by turtle name. state can either be
-        up, down, or a single non-blank character.
-        The literal values up and down lift and drop the pen respectively; any other value will be
-        interpreted as the turtle’s new brush character.
-     4. move name distance which will instruct the turtle named name to move distance units in
-        its current direction.
-     5. right name angle and left name angle which will instruct the turtle named name to rotate
-        angle degrees clockwise (right) or anti-clockwise (left, also known as counterclockwise).
-        Assume that the angle parameter is a positive integer multiple of 45.
-     6. show which will output the contents of the paper to the current output stream.
-   * 
-   * 
-   */
-  
-  
-  
-  
-
+    while ((tokens = lexer.tokenise(" ")) != null) {
+      
+      ArrayList<Function> functions = parser.parse(tokens);
+      
+      if (functions.isEmpty()) {
+        System.err.println("No functions to evaluate!");
+      } else {
+        //Evaluate each function
+        for (int i=0; i<functions.size(); i++) {
+          Function f = functions.get(i);
+          //System.out.println(f.toString());
+          evaluate(f.getFunctionName(),f.getFunctionArgumentsAsString(tokens));
+        }
+      }
+      
+    }
+    
+    
+  }
 }

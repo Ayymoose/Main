@@ -2,7 +2,6 @@ package interpreter;
 
 import java.util.Scanner;
 
-
 public class Lexer {
 
     private Scanner scanner;
@@ -17,8 +16,7 @@ public class Lexer {
      return string.split(delimiter).length;
     }
     
-    //Tokenises the input to give back a list of tokens to be passed to the parser
-    //Returns a list of tokens
+    //Returns a list of tokens , should ignore white space 
     public String[] tokenise(String delimiter) {
       
       String[] tokens = null;
@@ -33,14 +31,14 @@ public class Lexer {
           int numberOfTokens = tokenCount(input,delimiter);
 
           if (numberOfTokens > 0) {
-            //Populate the array with whatever input we are fed
             tokens = new String[numberOfTokens];
-            //Easy tokenising by using split!
             tokens = input.split(delimiter); 
-           
           }
           return tokens;
         }
+        
+        
+        
       }
       return null;
     }
