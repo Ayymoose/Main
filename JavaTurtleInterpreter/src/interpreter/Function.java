@@ -5,8 +5,6 @@ import interpreter.exceptions.InsufficientArgumentException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class Function {
@@ -84,14 +82,10 @@ public class Function {
   }
   
   //Returns the number of arguments functionName has (index represents the overload index)
-  
-  //Returns the number of arguments a function has
   public int getNumberOfArguments(String functionName,int index) {
     return (functionMap.get(functionName)[index][0] != Argument.NO_ARGUMENT ? functionMap.get(functionName)[index].length : 0);
   }
   
-  //Returns the arguments for the function as Argument[]
- 
   //Returns an array of Argument for functionName ; (index represents the overload index)
   public Argument[] getFunctionArguments(String functionName,int index) {
     return functionMap.get(functionName)[index];
@@ -129,7 +123,7 @@ public class Function {
     }
     return args;
   }
-  
+
   //Returns the number of overloads a function has
   public int getNumberOfOverloads(String functionName) {
     return functionMap.get(functionName).length;
@@ -137,7 +131,6 @@ public class Function {
   
   //Returns true iff the number of arguments matches that of the function functionName
   public boolean argumentNumberCheck(String functionName,int arguments) throws InsufficientArgumentException {
-    
     //This function has to check all the overloads if they match
     int functionOverloads = getNumberOfOverloads(functionName);
     boolean result = false;
@@ -150,10 +143,8 @@ public class Function {
     if (!result) {
       throw new InsufficientArgumentException("Too many/few arguments provided for function '" + functionName + "'");
     }
-    
     return result;
   }
-  
   
   //Returns true iff the arguments are exactly the same type as the function signature
   public boolean argumentTypeCheck(String functionName,Argument[] arguments) throws IllegalArgumentException{
@@ -177,7 +168,6 @@ public class Function {
     return result;
   }
   
-  
   //Returns true iff we can evaluate the function functionName with the given arguments
   public boolean canEvaluate(String functionName,Argument[] arguments)  {
     try {
@@ -200,7 +190,7 @@ public class Function {
   }
   
   //Returns true iff the token is a keyword
-  //TODO: Fix
+  //TODO: Fix ; a string will match a keyword or vice versa (Don't know how to fix?)
   public boolean isKeyword(String token) {
   //A keyword can also be a non blank character
     return keywords.contains(token) || token.matches("[^ ]");

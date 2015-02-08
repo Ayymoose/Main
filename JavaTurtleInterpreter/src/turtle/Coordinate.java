@@ -7,9 +7,7 @@ public class Coordinate {
   //In an array
   //x = ROW
   //y = COL
-  
-  
-  
+
   public Coordinate(int x,int y) {
     this.x = x;
     this.y = y;

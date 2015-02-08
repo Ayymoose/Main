@@ -5,7 +5,6 @@ import util.Rotation;
 
 public interface Turtle {
 
-  
   void changePen(Pen penState);
   
   void changeBrush(char brush);

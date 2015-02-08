@@ -55,11 +55,8 @@ public class Paper {
     }
   }
   
-  
-  
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    //Display only
     for (int x=0; x<rows; x++) {
       for (int y=0; y<cols; y++) {
         sb.append(paper[x][y]);

@@ -40,8 +40,6 @@ public abstract class AbstractTurtle implements Turtle {
   @Override
   public void draw() {
     if (penState == Pen.DOWN && paper.contains(coordinate.getX(),yOffset  - coordinate.getY())) {
-      //ADDED THIS LINE THAT AFFECTS DRAW && paper.contains(coordinate.getX(),yOffset  - coordinate.getY())
-      
       paper.write(coordinate.getX(),yOffset  - coordinate.getY(), brush);
     }
   }
@@ -51,7 +49,6 @@ public abstract class AbstractTurtle implements Turtle {
     
     int stepX = direction.getStepX();
     int stepY = direction.getStepY();
-
     //Move and then draw and when the turtle stops with the pen DOWN there is a character underneath
     for (int i=0; i<steps; i++) {
       if (paper.contains(coordinate.getX() + stepX,coordinate.getY() + stepY)) {
@@ -59,8 +56,6 @@ public abstract class AbstractTurtle implements Turtle {
       }
       draw();
     }
-    
-    
   }
   
   @Override
