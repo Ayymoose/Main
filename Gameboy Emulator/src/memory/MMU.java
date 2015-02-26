@@ -1,6 +1,13 @@
 package memory;
 
 public class MMU {
-
-  //TODO: Implement Memory Management Unit
+  
+  /*
+   * MMU: Memory Management Unit
+   * Maps instructions and opcodes
+   */
+  
+  //Z80 opcode map
+  
+  
 }
