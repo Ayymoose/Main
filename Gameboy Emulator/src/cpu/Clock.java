@@ -9,5 +9,10 @@ public class Clock {
   public Clock(int time) {
     this.time = time;
   }
+  
+  //Absolute
+  public void setTime(int time) {
+    this.time = time;
+  }
 
 }
