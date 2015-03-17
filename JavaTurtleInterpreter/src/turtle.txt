@@ -1,5 +1,0 @@
-new reflecting tur 3 5 f
-right tur 45
-pen tur down
-move tur 23
-show
