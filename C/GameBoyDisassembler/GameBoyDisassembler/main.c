@@ -2,29 +2,49 @@
 #include <stdlib.h>
 #include "opcode.h"
 
+
 struct opcode** opcodeMapMain;
 struct opcode** opcodeMapCB;
 
 #pragma warning (disable : 4996)
 
-typedef unsigned char byte;
+typedef unsigned char byte; //Should be globally defined
 
 //GameBoy begins executing instructions at 0x100 in memory
 #define INSTRUCTION_EXECUTION_ADDRESS 0x100
 #define PREFIX_CB 0xCB
+#define MAXIMUM_OPCODE_LENGTH 16 //Ugh I'm unsure about this
+#define OPERAND_COUNT 2
+//
+
+#define VERSION 1
+#define AUTHOR "Moose"
+
 /*
 
   Z80 GameBoy ROM disassembler in C
-  Purpose: -
-  Command line: GameBoyDisassembler.exe <file_name> <number_of_lines_of_disassembly>
+  Purpose: To further understand how hardware works (although unrelated here...) I mean to understand the structure of the GameBoy further.
+  Command line: GameBoyDisassembler.exe <file_name> <number_of_lines_of_disassembly> (-f = entire file)
+
+  Cool! I made a disassembler for the GameBoy in C!
+  Next up! Cartridge information about a game!
+  -Moose
 
 */
 
 /*
   
+  Bugs:
+  1. The lines of disassembly is incorrect! 
+  Everytime I encounter an opcode, I must decrement the counter 
+
+
   Problems:
 
-  1. Cannot figure out a way to display the actual address or operand instead of a/d/8/16 in the opcode name.
+  2. I do not free the allocated memory from the creation of the opcodes! Very bad!
+  3. I'm using a hack to display the opcodes via re/allocation of the variable; I don't like this
+  4. The opcode struct has unnecessary fields which I have done nothing about
+  5. Do I need to care about endianess here?
 
   Possible features
 
@@ -33,66 +53,84 @@ typedef unsigned char byte;
   3. Commented assembly commands
   4. Statistics about file
   5. Code refactoring
-  6. Command line input
 
 */
 
 int main(int argc, char** argv) {
+  
+  //"E:\\Ayman\\Programming\\github\\Main\\C\\GameBoyEmulatorC\\GameBoyEmulatorC\\Pokemon Red.gb" 10 
 
-  //1. Load ROM into memory
-  FILE* rom = fopen("E:\\Ayman\\Programming\\github\\Main\\C\\GameBoyEmulatorC\\GameBoyEmulatorC\\Pokemon Red.gb", "r");
+  if (argc) {
 
-  //2. Display disassembled code 
-  if (rom) {
+    //GameBoyDisassembler.exe <file_name> <start_address_of_disassembly (default 0x100) <number_of_lines_of_disassembly> (-f = all)
 
-    //Size of file in bytes
-    long size = INSTRUCTION_EXECUTION_ADDRESS + 100;//fileSize(rom);
+    const char* fileName = argv[1];
+    const int LINES_OF_DISASSEMBLY;
+    sscanf(argv[2], "%d", &LINES_OF_DISASSEMBLY);
+    int linesOfDisassembly = LINES_OF_DISASSEMBLY;
 
-    //Pointer to the ROM data
-    byte* romData = loadROM(rom);
+    //
+    printf("GameBoy Disassembler C (GBC) version %d\nCreated by %s\n", VERSION, AUTHOR);
+    printf("Disassembling %s\n", fileName);
+    //
 
-    //Pointer to the data which we will use to disassemble the file
-    long romPointer = INSTRUCTION_EXECUTION_ADDRESS;
+    //1. Load ROM into memory
+    FILE* rom = fopen(fileName, "r");
 
-    //Pointer to an opcode struct that contains information about the opcode
-    struct opcode* opc;
+    //2. Display disassembled code 
+    if (rom) {
 
-    //Length of the instruction (opcode + operand)
-    byte instructionLength;
+      //Size of file in bytes
+      long size = fileSize(rom);
 
-    //Initialises the table of opcodes
-    initiliaseOpcodeTable();
+      //Pointer to the ROM data
+      byte* romData = loadROM(rom);
 
-    //Pointers became null somehow
-    if (opcodeMapCB == NULL || opcodeMapMain == NULL) {
-      printf("%06X\n%06X\n",opcodeMapMain, opcodeMapCB);
-      getchar();
-      exit(-1);
-    }
+      //Pointer to the data which we will use to disassemble the file
+      //Point to start of execution in the ROM file
+      long romPointer = INSTRUCTION_EXECUTION_ADDRESS;
 
-    //Small array to hold the bytes of the operand
-    byte address[2];
+      //Pointer to an opcode struct that contains information about the opcode
+      struct opcode* opcode;
 
-    //Print information at top
-    printf(" ---------------------------------------------\n");
-    printf(" Address\t Opcode\t Disassembled Commands\n"); //Oooo! Add operand column too!
-    printf(" ---------------------------------------------\n");
+      //Length of the instruction (opcode + operand)
+      byte instructionLength;
 
-    //Loop through code
-    while (romPointer < size) {
-      
-      //Read a byte
-      byte instruction = romData[romPointer];     
+      //Initialises the table of opcodes
+      initiliaseOpcodeTable();
 
-      //Decode it
-      opc = (instruction != PREFIX_CB ? getOpcode(opcodeMapMain, instruction) : getOpcode(opcodeMapCB, instruction));
+      //Enum for instruction type
+      enum instructionType {
+        INSTRUCTION_NORMAL,
+        INSTRUCTION_8,
+        INSTRUCTION_16
+      } instructionType;
 
-      //Err what was the endianess of the Z80?
-      //For display purposes and incrementing the romPointer
-      //We must calculate the length of the instruction
+      enum instructionType opcodeType;
 
-      switch (instruction) {
-        //8 Bit
+      //Small array to hold the bytes of the operand
+      byte operand[OPERAND_COUNT];
+
+      //Print information at top
+      printf(" -----------------------------------------------------\n");
+      printf(" Address\t Opcode\t Operand(s)\t Disassembly\n");
+      printf(" -----------------------------------------------------\n");
+      // INSTRUCTION_EXECUTION_ADDRESS + LINES_OF_DISASSEMBLY
+      //Loop through code
+      while (romPointer < size && linesOfDisassembly) {
+
+        //Read a byte
+        byte instruction = romData[romPointer];
+
+        //Decode it
+        opcode = (instruction != PREFIX_CB ? getOpcode(opcodeMapMain, instruction) : getOpcode(opcodeMapCB, instruction = romData[++romPointer]));
+
+        //Err what was the endianess of the Z80?
+        //For display purposes and incrementing the romPointer
+        //We must calculate the length of the instruction
+
+        switch (instruction) {
+          //8 Bit
         case 0x06: //LD B, d8
         case 0x0E: //LD C, d8
         case 0x16: //LD D,d8
@@ -119,10 +157,11 @@ int main(int argc, char** argv) {
         case 0xF8: //LD HL,SP+r8
         case 0xFE: //CP d8
           instructionLength = 2;
-          address[0] = romData[romPointer + 1];
-          address[1] = 0x00;
-          break; 
-        //16-bit 
+          operand[0] = romData[romPointer + 1];
+          operand[1] = 0x00;
+          opcodeType = INSTRUCTION_8;
+          break;
+          //16-bit 
         case 0x01: //LD (BC) ,d16  
         case 0x08: //LD a16, SP
         case 0x11: //LD DE,d16
@@ -141,33 +180,82 @@ int main(int argc, char** argv) {
         case 0xEA: //LD (a16),A
         case 0xFA: //LD A,(a16)
           instructionLength = 3;
-          address[0] = romData[romPointer + 1];
-          address[1] = romData[romPointer + 2];
-        break;
-        default:
-          address[0] = address[1] = 0x00;
-          instructionLength = 1;
+          operand[0] = romData[romPointer + 1];
+          operand[1] = romData[romPointer + 2];
+          opcodeType = INSTRUCTION_16;
           break;
+        default:
+          operand[0] = operand[1] = 0x00;
+          instructionLength = 1;
+          opcodeType = INSTRUCTION_NORMAL;
+          break;
+        }
+
+        //Display
+
+        //Dirty but it works
+        byte* mnemonic = calloc(MAXIMUM_OPCODE_LENGTH, sizeof(byte)); //Could crash at some point
+        int index, i; //Better names needed
+
+        switch (opcodeType) {
+        case INSTRUCTION_NORMAL:
+          printf(" 0x%06X \t %02X \t -- \t\t %s \n", romPointer, instruction, opcode->name);
+          break;
+        case INSTRUCTION_8:
+        case INSTRUCTION_16:
+          index = i = 0;
+          while (opcode->name[i]) {
+            if (opcode->name[i] == '%') {
+              switch (opcode->name[i + 1]) {
+              case 'w':
+                sprintf(mnemonic + index, "0x%02X%02X", operand[1], operand[0]);
+                index += 6; //Length of string in sprintf
+                break;
+              case 'b':
+                sprintf(mnemonic + index, "0x%02X", operand[0]);
+                index += 4;
+                break;
+              case 'r':
+                sprintf(mnemonic + index, "(PC+0x%02X)", operand[0]);
+                index += 9;
+                break;
+              }
+              i++;
+            }
+            else {
+              mnemonic[index] = opcode->name[i];
+              index++;
+            }
+            i++;
+          }
+          if (opcodeType == INSTRUCTION_8) {
+            printf(" 0x%06X \t %02X \t %02X \t\t %s \n", romPointer, instruction, operand[0], mnemonic);
+          }
+          else {
+            printf(" 0x%06X \t %02X \t %02X%02X \t\t %s \n", romPointer, instruction, operand[1], operand[0], mnemonic);
+          }
+
+          free(mnemonic);
+          break;
+        }
+        linesOfDisassembly--;
+        //Advance romPointer by how many bytes the instruction (opcode + operand) took
+        romPointer += instructionLength;
       }
 
-      //Display e.g
-      //0x000000 FB NOP
-      printf(" 0x%06X \t %02X \t %s ", romPointer, instruction, opc->name);
-      printf((instructionLength == 1 ? "\n" : "0x%02X%02X \n"),address[1],address[0]);
+      //Free allocated memory
+      //I forgot to free all the opcodes in the table! -> I don't think I've freed the array properly (if it's 2D then I can free the opcodes)
+      free(opcodeMapMain);
+      free(opcodeMapCB);
+      free(romData);
 
-      //Advance romPointer by how many bytes the instruction (opcode + operand) took
-      romPointer+=instructionLength;
+      printf("Displaying %d lines of disassembly.\n", LINES_OF_DISASSEMBLY);
+      //printf("Jump to address: "); Next Version!
+      printf("Press any key to exit...");
+
+      getchar();
     }
-
-    //Free allocated memory
-    free(opcodeMapMain);
-    free(opcodeMapCB);
-    free(romData);
-
-    printf("Displaying %d lines of disassembly.\n", size - INSTRUCTION_EXECUTION_ADDRESS);
-    printf("Press any key to exit...");
-    getchar();
-  } 
+  }
   
   return 0;
 }

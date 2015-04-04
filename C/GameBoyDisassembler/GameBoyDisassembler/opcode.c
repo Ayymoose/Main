@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "opcode.h"
 
+
 #define FILE_ERROR -1
 
 typedef unsigned char byte;
@@ -53,15 +54,13 @@ byte* loadROM(FILE* file) {
 
 }
 
-//Z80 opcodes go here
-//8 bits -> 256 different opcodes (+256 more for bitwise operations)
-//Who knew writing a disassembler was this easy?
+//Opcode related functions
 
 #define OPCODE_COUNT 256
 
 //Creates a new opcode and returns a pointer to a struct
-struct opcode* createOpcode(char* name, int m_cycles, int t_cycles, int Z, int N, int H, int C) {
-  struct opcode* opCode = malloc(sizeof(struct opcode));
+struct opcode* createOpcode(char* name, int m_cycles, int t_cycles, byte Z, byte N, byte H, byte C) {
+  struct opcode* opCode = malloc(sizeof(struct opcode*));
   opCode->name = name;
   opCode->t_cycles = t_cycles;
   opCode->m_cycles = m_cycles;
@@ -92,8 +91,6 @@ struct opcode* getOpcode(struct opcode** map, int opcodeValue) {
   return map[opcodeValue];
 }
 
-//
-
 //Create the opcode mappings
 void initiliaseOpcodeTable() {
 
@@ -112,68 +109,68 @@ void initiliaseOpcodeTable() {
   //Well I could have an option to get more detail about the opcode.
   //Meh.
   mapOpcode(opcodeMapMain, 0x00, createOpcode("NOP", 1, 4, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x01, createOpcode("LD (BC) ,d16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x01, createOpcode("LD (BC) ,%w", 3, 12, 0, 0, 0, 0)); //d16
   mapOpcode(opcodeMapMain, 0x02, createOpcode("LD (BC) ,A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x03, createOpcode("INC BC", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x04, createOpcode("INC B", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x05, createOpcode("DEC B", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x06, createOpcode("LD B, d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x06, createOpcode("LD B, %b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0x07, createOpcode("RLCA", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x08, createOpcode("LD a16, SP", 1, 4, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x08, createOpcode("LD %w, SP", 1, 4, 0, 0, 0, 0)); //a16
   mapOpcode(opcodeMapMain, 0x09, createOpcode("ADD HL,BC", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x0A, createOpcode("LD A,(BC)", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x0B, createOpcode("DEC BC", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x0C, createOpcode("INC C", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x0D, createOpcode("DEC C", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x0E, createOpcode("LD C, d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x0E, createOpcode("LD C, %b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0x0F, createOpcode("RRCA", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x10, createOpcode("STOP 0", 1, 4, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x11, createOpcode("LD DE,d16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x11, createOpcode("LD DE,%w", 3, 12, 0, 0, 0, 0)); //d16
   mapOpcode(opcodeMapMain, 0x12, createOpcode("LD (DE),A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x13, createOpcode("INC DE", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x14, createOpcode("INC D", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x15, createOpcode("DEC D", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x16, createOpcode("LD D,d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x16, createOpcode("LD D,%b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0x17, createOpcode("RLA", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x18, createOpcode("JR r8", 1, 4, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x18, createOpcode("JR %r", 1, 4, 0, 0, 0, 0)); //r8
   mapOpcode(opcodeMapMain, 0x19, createOpcode("ADD HL,DE", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x1A, createOpcode("LD A,(DE)", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x1B, createOpcode("DEC DE", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x1C, createOpcode("INC E", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x1D, createOpcode("DEC E", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x1E, createOpcode("LD E, d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x1E, createOpcode("LD E, %b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0x1F, createOpcode("RRA", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x20, createOpcode("JR NZ,r8", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x21, createOpcode("LD HL,d16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x20, createOpcode("JR NZ,%r", 3, 12, 0, 0, 0, 0)); //r8
+  mapOpcode(opcodeMapMain, 0x21, createOpcode("LD HL,%w", 3, 12, 0, 0, 0, 0)); //d16
   mapOpcode(opcodeMapMain, 0x22, createOpcode("LD (HL+),A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x23, createOpcode("INC HL", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x24, createOpcode("INC H", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x25, createOpcode("DEC H", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x26, createOpcode("LD H,d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x26, createOpcode("LD H,%b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0x27, createOpcode("DAA", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x28, createOpcode("JR Z,r8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x28, createOpcode("JR Z,%b", 3, 12, 0, 0, 0, 0)); //r8
   mapOpcode(opcodeMapMain, 0x29, createOpcode("ADD HL,HL", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x2A, createOpcode("LD A,(HL+)", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x2B, createOpcode("DEC HL", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x2C, createOpcode("INC L", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x2D, createOpcode("DEC L", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x2E, createOpcode("LD L,d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x2E, createOpcode("LD L,%b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0x2F, createOpcode("CPL", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x30, createOpcode("JR NC,r8", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x31, createOpcode("LD SP,d16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x30, createOpcode("JR NC,%r", 3, 12, 0, 0, 0, 0)); //r8
+  mapOpcode(opcodeMapMain, 0x31, createOpcode("LD SP,%w", 3, 12, 0, 0, 0, 0)); //d16
   mapOpcode(opcodeMapMain, 0x32, createOpcode("LD (HL-),A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x33, createOpcode("INC SP", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x34, createOpcode("INC (HL)", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x35, createOpcode("DEC (HL)", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x36, createOpcode("LD (HL),d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x36, createOpcode("LD (HL),%b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0x37, createOpcode("SCF", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x38, createOpcode("JR C,r8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x38, createOpcode("JR C,%r", 3, 12, 0, 0, 0, 0)); //r8
   mapOpcode(opcodeMapMain, 0x39, createOpcode("ADD HL,SP", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x3A, createOpcode("LD A,(HL-)", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x3B, createOpcode("DEC SP", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x3C, createOpcode("INC A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x3D, createOpcode("DEC A", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0x3E, createOpcode("LD A,d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0x3E, createOpcode("LD A,%b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0x3F, createOpcode("CCF", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x40, createOpcode("LD B,B", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0x41, createOpcode("LD B,C", 3, 12, 0, 0, 0, 0));
@@ -305,67 +302,67 @@ void initiliaseOpcodeTable() {
   mapOpcode(opcodeMapMain, 0xBF, createOpcode("CP A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xC0, createOpcode("RET NZ", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xC1, createOpcode("POP BC", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xC2, createOpcode("JP NZ,a16", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xC3, createOpcode("JP a16", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xC4, createOpcode("CALL NZ,a16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xC2, createOpcode("JP NZ,%w", 3, 12, 0, 0, 0, 0)); //a16
+  mapOpcode(opcodeMapMain, 0xC3, createOpcode("JP %w", 3, 12, 0, 0, 0, 0)); //a16
+  mapOpcode(opcodeMapMain, 0xC4, createOpcode("CALL NZ,%w", 3, 12, 0, 0, 0, 0)); //a16
   mapOpcode(opcodeMapMain, 0xC5, createOpcode("PUSH BC", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xC6, createOpcode("ADD A,d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xC6, createOpcode("ADD A,%b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0xC7, createOpcode("RST 00H", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xC8, createOpcode("RET Z", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xC9, createOpcode("RET", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xCA, createOpcode("JP Z,a16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xCA, createOpcode("JP Z,%w", 3, 12, 0, 0, 0, 0)); //a16
   mapOpcode(opcodeMapMain, 0xCB, createOpcode("PREFIX CB", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xCC, createOpcode("CALL Z,a16", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xCD, createOpcode("CALL a16", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xCE, createOpcode("ADC A,d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xCC, createOpcode("CALL Z,%w", 3, 12, 0, 0, 0, 0)); //a16
+  mapOpcode(opcodeMapMain, 0xCD, createOpcode("CALL %w", 3, 12, 0, 0, 0, 0)); //a16
+  mapOpcode(opcodeMapMain, 0xCE, createOpcode("ADC A,%b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0xCF, createOpcode("RST 08H", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xD0, createOpcode("RET NC", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xD1, createOpcode("POP DE", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xD2, createOpcode("JP NC,a16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xD2, createOpcode("JP NC,%w", 3, 12, 0, 0, 0, 0)); //a16
   mapOpcode(opcodeMapMain, 0xD3, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xD4, createOpcode("CALL NC,a16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xD4, createOpcode("CALL NC,%w", 3, 12, 0, 0, 0, 0)); //a16
   mapOpcode(opcodeMapMain, 0xD5, createOpcode("PUSH DE", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xD6, createOpcode("SUB d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xD6, createOpcode("SUB %b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0xD7, createOpcode("RST 10H", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xD8, createOpcode("RET C", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xD9, createOpcode("RETI", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xDA, createOpcode("JP C,a16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xDA, createOpcode("JP C,%w", 3, 12, 0, 0, 0, 0)); //a16
   mapOpcode(opcodeMapMain, 0xDB, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xDC, createOpcode("CALL C,a16", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xDC, createOpcode("CALL C,%w", 3, 12, 0, 0, 0, 0)); //a16
   mapOpcode(opcodeMapMain, 0xDD, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xDE, createOpcode("SBC A,d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xDE, createOpcode("SBC A,%b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0xDF, createOpcode("RST 18H", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xE0, createOpcode("LDH (a8),A", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xE0, createOpcode("LDH (%b),A", 3, 12, 0, 0, 0, 0)); //a8
   mapOpcode(opcodeMapMain, 0xE1, createOpcode("POP HL", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xE2, createOpcode("LD (C),A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xE3, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xE4, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xE5, createOpcode("PUSH HL", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xE6, createOpcode("AND d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xE6, createOpcode("AND %b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0xE7, createOpcode("RST 20H", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xE8, createOpcode("ADD SP,r8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xE8, createOpcode("ADD SP,%b", 3, 12, 0, 0, 0, 0)); //r8
   mapOpcode(opcodeMapMain, 0xE9, createOpcode("JP (HL)", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xEA, createOpcode("LD (a16),A", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xEA, createOpcode("LD (%w),A", 3, 12, 0, 0, 0, 0)); //a16
   mapOpcode(opcodeMapMain, 0xEB, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xEC, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xED, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xEE, createOpcode("XOR d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xEE, createOpcode("XOR %b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0xEF, createOpcode("RST 28H", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xF0, createOpcode("LDH A,(a8)", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xF0, createOpcode("LDH A,(%b)", 3, 12, 0, 0, 0, 0)); //a8
   mapOpcode(opcodeMapMain, 0xF1, createOpcode("POP AF", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xF2, createOpcode("LD A,(C)", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xF3, createOpcode("DI", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xF4, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xF5, createOpcode("PUSH AF", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xF6, createOpcode("OR d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xF6, createOpcode("OR %b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0xF7, createOpcode("RST 30H", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xF8, createOpcode("LD HL,SP+r8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xF8, createOpcode("LD HL,SP+%b", 3, 12, 0, 0, 0, 0)); //r8
   mapOpcode(opcodeMapMain, 0xF9, createOpcode("LD SP,HL", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xFA, createOpcode("LD A,(a16)", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xFA, createOpcode("LD A,(%w)", 3, 12, 0, 0, 0, 0)); //a16
   mapOpcode(opcodeMapMain, 0xFB, createOpcode("EI", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xFC, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapMain, 0xFD, createOpcode("N/A", 3, 12, 0, 0, 0, 0));
-  mapOpcode(opcodeMapMain, 0xFE, createOpcode("CP d8", 3, 12, 0, 0, 0, 0));
+  mapOpcode(opcodeMapMain, 0xFE, createOpcode("CP %b", 3, 12, 0, 0, 0, 0)); //d8
   mapOpcode(opcodeMapMain, 0xFF, createOpcode("RST 38H", 3, 12, 0, 0, 0, 0));
 
   //CB Table opcodes
@@ -625,5 +622,4 @@ void initiliaseOpcodeTable() {
   mapOpcode(opcodeMapCB, 0xFD, createOpcode("SET 7,L", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapCB, 0xFE, createOpcode("SET 7,(HL)", 3, 12, 0, 0, 0, 0));
   mapOpcode(opcodeMapCB, 0xFF, createOpcode("SET 7,A", 3, 12, 0, 0, 0, 0));
-
 }
