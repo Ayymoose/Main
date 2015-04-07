@@ -104,7 +104,7 @@ int getElement(linkedList* list,int index) {
 
 //Sort a linked list
 void sortLinkedList(linkedList* list) {
- 
+  //Sorts list using a quick sort
 }
 
 //Size of the list

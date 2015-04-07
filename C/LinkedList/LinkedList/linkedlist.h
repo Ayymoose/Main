@@ -1,17 +1,6 @@
 #pragma once
 
-/* Generic implementation
-typedef union data {
-  char* string;
-  int integer;
-} dataValue;
-*/
-
-//General structure
-typedef struct node {
-  int data; 
-  node* next;
-} node;
+#include "node.h"
 
 //Single linked list
 typedef struct linkedList {
