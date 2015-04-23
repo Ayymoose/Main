@@ -31,7 +31,7 @@
 ;             }
 ;         }
 ;     }
-; }
+; } 
 ; ---------------------------------------------------------------------------
 ; main () {
 ;     matrix matrixA, matrixB, matrixC  ; Declare and suitably initialise
