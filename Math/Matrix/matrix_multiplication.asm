@@ -1,4 +1,4 @@
-
+;
 ; ***************************************************************
 ;       SKELETON: INTEL ASSEMBLER MATRIX MULTIPLY (LINUX)
 ; ***************************************************************
@@ -31,7 +31,7 @@
 ;             }
 ;         }
 ;     }
-; } 
+; }
 ; ---------------------------------------------------------------------------
 ; main () {
 ;     matrix matrixA, matrixB, matrixC  ; Declare and suitably initialise
@@ -68,7 +68,7 @@ main:
          call matrix_print
          add  rsp, 8
 
-         mov  rax, matrixB     ; matrixC.mult (matrixA, matrixB)               | 80 CHAR LIMIT
+         mov  rax, matrixB     ; matrixC.mult (matrixA, matrixB)
          push rax
          mov  rax, matrixA
          push rax
@@ -85,144 +85,153 @@ main:
 
 ; ---------------------------------------------------------------------
 
-matrix_print:                   ; void matrix_print ()
-         push rbp                ; setup base pointer
-         mov  rbp, rsp
-         
-         call output_newline          ;Output a new line                
-         lea rbp,[rax+16]             ;Calcuate base address to offset from            
-         for1: xor rcx,rcx            ;for (row=0; ... (Clear rcx)                  
-         loop1:
-           cmp rcx,[rax]              ;row < C.ROWS (row >= C.ROWS) 
-           jge end1                   ;Jump out of loop                                                    
-           for2: xor rdx,rdx          ;for (col=0; ... (Clear rdx)
-           loop2:
-              cmp rdx,[rax+8]         ;col < C.COLS (col >= C.COLS)     
-	      jge end2                ;Jump out of loop                      
-              call output_tab         ;Output tab
-              push qword[rbp]         ;Calculate address of an element and push onto stack
-              call output_int         ;Print element
-              add rsp,8               ;Restore stack pointer
-              add rbp,8               ;Increment base pointer to point to next element
-              inc rdx                 ;col++
-              jmp loop2;              ;Jump back to top of loop 
-                end2:   
-                  call output_newline ;Output newline                                     
-              inc rcx                 ;row++
-              jmp loop1 	      ;Jump back to outer loop  
-         end1:
-         pop  rbp                ; restore base pointer & return
-         ret
+matrix_print:
+  ;Prints out a matrix with tab spaces (each row on a new line)
+  push rbp
+  mov rbp,rsp
+  
+  push rbx  ;Save rbx 
+  push rcx  ;Save rcx
+  push rdx  ;Save rdx
+  push rsi  ;Save rsi
+  
+  call output_newline ;Outputs a new lone
+  lea rbx,[rbp+16]    ;Calculate the base address of the matrix  
+  mov rsi,[rbx]       ;Point rsi to rbx (we dereference rbx since LEA only calculates the address)
+  mov rbx,rsi         ;Point rbx to base of matrix
+  add rsi,16          ;Point rsi to the first element of the matrix
+  
+  ;row = RCX
+  ;col = RDX
+
+for1:
+  xor rcx,rcx         ;Clear rcx (rcx = row = 0)
+loop1:
+  cmp rcx,[rbx]       ;Compare row with matrix.rows
+  jge end1            ;Jump out of loop on ¬cond
+for2:
+  xor rdx,rdx         ;Clear rdx (rdx = col = 0)
+loop2:
+  cmp rdx,[rbx+8]     ;Compare col with matrix.cols
+  jge end2            ;Jump out of loop on ¬cond
+  call output_tab     ;Output a tab
+  push qword[rsi]     ;Push first element onto the stack to be printed
+  call output_int     ;Print out the element
+  add rsp,8           ;Restore the stack pointer (output_int leaves some garbage on the stack)
+  add rsi,8           ;Advance rsi to point to next element
+  inc rdx             ;rdx++ = col++
+  jmp loop2           ;Jump to top of inner loop
+end2:
+  call output_newline ;Output a new line 
+  inc rcx             ;rcx++ = row++
+  jmp loop1           ;Jump to top of outer loop  
+end1:
+  pop rsi             ;Restore rsi
+  pop rdx             ;Restore rdx
+  pop rcx             ;Restore rcx
+  pop rbx             ;Restore rbx
+  pop rbp             ;Restore rbp
+  ret                 ;Return 
+   
 ;  --------------------------------------------------------------------------
 
-matrix_mult:                    ; void matix_mult (matrix A, matrix B)
-
-         push rbp                ; setup base pointer
-         mov  rbp, rsp
-          
-         ;REGISTER TO VARIABLE MAP         
+matrix_mult:
+  push rbp
+  mov rbp,rsp
+  
+  ;Multiplies two matrices together 
+  
+  push rbx  ;Save rbx
+  push rcx  ;Save rcx
+  push rdx  ;Save rdx
+  push rsi  ;Save rsi
+  push rdi  ;Save rdi
  
-         ;rbx      = row
-         ;rcx      = col
-         ;rdx      = k
-         ;r8       = A.COLS
-         ;r9       = sum
-
-         ;[r10+8]  = A.COLS
-         ;[r12]    = C.ROWS
-         ;[r12+8]  = C.COLS                                     
-         
-         ;r10 = matrixA
-         ;r11 = matrixB
-         ;r12 = matrixC           
  
-         ;Use lea instruction to calculate base addresses
-         ;MATRIX BASE ADDRESSES
-         
-         ;matrixA
-         mov r10,[rbp+24]
-         lea r10,[r10]        
-         ;matrixB
-         mov r11,[rbp+32]
-         lea r11,[r11]
-         ;matrixC
-         mov r12,[rbp+16]
-         lea r12,[r12] 
-                
-         for3: xor rbx,rbx            ;for (row=0; ...) Clear rbx 
-         loop3:  
-            cmp rbx,[r12]             ;row < C.ROWS (row >= C.ROWS)                   
-            jge end3                  ;if row >= C.ROWS
-            for4: xor rcx,rcx         ;for (col=0; ... (Clear rdx)
-               loop4: 
-                 cmp rcx,[r12+8]      ;col < C.ROWS
-                 jge end4             ;if col >= C.ROWS   
-                 xor r9,r9            ;sum = 0 (Clear rax)     
-                 for5: xor rdi,rdi    ;for (k=0; ... (Clear rdx)      
-                 loop5: 
-                   cmp rdi,[r10+8]    ;k < A.COLS;   
-                   jge end5;          ;Jump out of loop
-                   ;Calculate sum 
-                   ;sum += A[row][k] * B[k][col]                   
-                   
-                   ;rax = A[row][k]
-                   ;r14 = B[k][col]
-                            
-                   ;BASE_ADDRESS (A) = [r10+16]
-                   ;BASE_ADDRESS (B) = [r11+16]
-                   ;row              = rbx
-                   ;col              = rcx
-                   ;k                = rdi
-                   ;ROW_SIZE (A)     = [r10+8]
-                   ;K_ROW_SIZE (B)   = [r11] 
-                   ;ELEMENT_SIZE     = 8
-                   ;BASE_ADDRESS + (ROW_INDEX * ROW_SIZE + COL_INDEX) * ELEMENT_SIZE  
-                   ;Calculate A[row][k]                   
-                   mov rax,qword[r10+8]  ;rax = ROW_SIZE
-                   mul rbx               ;rax = ROW_SIZE * ROW_INDEX
-                   add rax,rdi           ;rax = ROW_SIZE * ROW_INDEX + COL_INDEX
-                   lea rax,[rax*8]       ;rax = (ROW_SIZE * ROW_INDEX + COL_INDEX) * ELEMENT_SIZE
-                   lea rax,[rax+r10+16]  ;rax += BASE_ADDRESS 
-                   mov r14,qword[rax]    ;Store in r14
-                   ;Calculate B[k][col]                    
-                   mov rax,qword[r11+8]  ;rax = ROW_SIZE
-                   mul rdi               ;rax = ROW_SIZE * ROW_INDEX
-                   add rax,rcx           ;rax = ROW_SIZE * ROW_INDEX + COL_INDEX
-                   lea rax,[rax*8]       ;rax = (ROW_SIZE * ROW_INDEX + COL_INDEX) * ELEMENT_SIZE
-                   lea rax,[rax+r11+16]  ;rax += BASE_ADDRESS                             
-                   mov rax,[rax]         ;Move result back into rax
-                   mul r14               ;Multiply by A[row][k]
-                   jo overflow           ;Jump to end if overflow occured
-                   add r9,rax            ;Add to sum (sum += A[row][k] * B[k][col]                           
-                   inc rdi               ;k++
-                   jmp loop5             ;Jump back to top of loop
-                   end5:         
-                     ;Base_Address = [r12+16]
-                     ;col          = rcx
-                     ;ROW_SIZE     = [r12+8]
-                     ;row          = rbx
-                     ;ELEMENT_SIZE = 8                               
-                     ;C[row][col]  = sum                            
-                     mov rax,qword[r12+8] ;rax = ROW_SIZE               
-                     mul rbx              ;rax = ROW_SIZE * ROW
-                     add rax,rcx          ;rax = ROW_SIZE * ROW + COL                 
-                     lea rax,[rax*8]      ;rax = (ROW_SIZE * ROW + COL) * 8
-                     lea rax,[rax+r12+16] ;rax = rax + BASE_ADDRESS of matrix
-                     mov qword[rax],r9    ;C[row][col] = sum
-                     inc rcx              ;col++
-                     jmp loop4            ;Jump back to top of loop4
-                   end4:     
-                     inc rbx              ;row++
-                     jmp loop3            ;Jump to top loop
-           end3:
-             jmp funcEnd                  ;Terminate function
+  ;Matrix[i][j] = Base_Address + (Row * Row_Size + Col) * 8
+  ;Base_Adress = Address of first element of array (Usually +16 of matrix address)
+  ;rbx = row
+  ;rcx = col
+  ;rdx = k
+  ;rax = sum 
+  
+  lea rax,[rbp+16]    ;Calculate base address of matrixC
+  mov rax,[rax]       ;Store in rax 
+  push qword[rax]     ;Push C.ROWS onto stack
+  push qword[rax+8]   ;Push C.COLS onto stack 
+  lea rax,[rbp+24]    ;Calculate base address of matrixA
+  mov rax,[rax]       ;Store in rax 
+  push qword[rax+8]   ;Push A.COLS onto stack 
+  lea rax,[rbp+32]    ;Calculate base address of matrixB
+  mov rax,[rax]       ;Store in rax
+  push qword[rax+8]   ;Push B.ROW_SIZE onto stack 
+  
+  push r8             ;Save r8 (This shouldn't really be used but I realised I needed it at the end)            
+  
+for3:
+  xor rbx,rbx         ;Clear rbx (rbx = row = 0)
+loop3:
+  cmp rbx,[rbp-48]    ;Compare row with C.ROWS 
+  jge end3            ;Jump out of loop on ¬cond 
+for4:
+  xor rcx,rcx         ;Clear rcx (rcx = col = 0)
+loop4:
+  cmp rcx,[rbp-56]    ;Compare col with C.COLS 
+  jge end4            ;Jump out of loop on ¬cond
+  xor rax,rax         ;Clear rax (rax = sum = 0)
+for5:
+  xor rdx,rdx         ;Clear rdx (rdx = k = 0)
+loop5:
+  cmp rdx,[rbp-64]    ;Compare k with A.COLS
+  jge end5            ;Jump out of loop on ¬cond   
+  ;A[row][k]
+  mov rsi,[rbp-64]     ;rsi = A.ROW_SIZE    
+  imul rsi,rbx         ;rsi = A.ROW_SIZE * row 
+  add rsi,rdx          ;rsi = A.ROW_SIZE * row + k 
+  lea rsi,[rsi*8]      ;rsi = (A.ROW_SIZE * row + k) * 8
+  mov rdi,[rbp+24]     ;Get address of matrixA
+  lea rsi,[rsi+rdi+16] ;rsi = A.BASE_ADDRESS + (A.ROW_SIZE * row + k) * 8 
+  mov rsi,[rsi]        ;rsi = A[row][k]
+  ;B[k][col]
+  mov rdi,[rbp-72]     ;rdi = B.ROW_SIZE 
+  imul rdi,rdx         ;rdi = B.ROW_SIZE * k 
+  add rdi,rcx          ;rdi = B.ROW_SIZE * k + col
+  lea rdi,[rdi*8]      ;rdi = (B.ROW_SIZE * k + col) * 8
+  mov r8,[rbp+32]      ;Get address of matrixB
+  lea rdi,[rdi+r8+16]  ;rdi = B.BASE_ADDRESS + (B.ROW_SIZE * k + col) * 8  
+  mov rdi,[rdi]        ;rdi = B[k][col] 
+  imul rdi,rsi         ;rdi = A[row][k] * B[k][col]
+  ;sum += A[row][k] * B[k][col]
+  add rax,rdi          ;rax += A[row][k] * B[k][col]
+  inc rdx              ;rdx++ = k++
+  jmp loop5            ;Jump to top of current loop 
+end5:
+  ;C[row][col] = sum 
+  mov rsi,[rbp-56]     ;rsi = C.ROW_SIZE 
+  imul rsi,rbx         ;rsi = C.ROW_SIZE * row 
+  add rsi,rcx          ;rsi = C.ROW_SIZE * row + col 
+  lea rsi,[rsi*8]      ;rsi = (C.ROW_SIZE * row + col) * 8
+  mov rdi,[rbp+16]     ;Get address of matrixC                      
+  lea rsi,[rsi+rdi+16] ;rsi = C.BASE_ADDRESS + (C.ROW_SIZE * row + col) * 8
+  mov qword[rsi],rax   ;C[row][k] = sum 
+  inc rcx              ;rcx++ = col++
+  jmp loop4            ;Jump to top of current loop 
+end4:
+  inc rbx              ;rbx++ = row++
+  jmp loop3            ;Jump to outer most loop 
+end3:
+  jmp matrix_mult_end  ;Jump out of all loops to end of function 
+matrix_mult_end:
+  pop r8
+  add rsp,32           ;Restore rsp to point to rdi 
+  pop rdi              ;Restore rdi 
+  pop rsi              ;Restore rsi 
+  pop rdx              ;Restore rdx 
+  pop rcx              ;Restore rcx 
+  pop rbx              ;Restore rbx 
+  pop rbp              ;Restore rbp 
+  ret                  ;Return 
 
-         overflow: 
-           call print                                    
- 
-         funcEnd:
-           pop  rbp                ; restore base pointer & return
-           ret
 ; ---------------------------------------------------------------------
 ;                    ADDITIONAL METHODS
 
@@ -237,18 +246,6 @@ WRITE   equ     4               ; Linux system call 4 i.e. write ()
 STDOUT  equ     1               ; File descriptor 1 i.e. standard output
 
 ; ------------------------
-
-print: 
-        mov rdx,msg_len		; arg3, length of string to print
-	mov rcx,msg_overflow    ; arg2, pointer to string
-	mov rbx,1		; arg1, where to write, screen
-	mov rax,4		; write sysout command to int 80 hex
-	int 0x80		; interrupt 80 hex, call kernel
-	
-	mov rbx,0		; exit code, 0=normal
-	mov rax,1		; exit command to kernel
-	int 0x80		; interrupt 80 hex, call kernel
-
 
 os_return:
         mov  rax, EXIT          ; Linux system call 1 i.e. exit ()
@@ -357,9 +354,6 @@ L99:
 
 segment .data
 
-msg_overflow db "Overflow occurred in matrix calculation!.",10
-msg_len equ $-msg_overflow
-
         ; Declare test matrices
 matrixA DQ 2                    ; ROWS
         DQ 3                    ; COLS
@@ -374,8 +368,8 @@ matrixB DQ 3                    ; ROWS
 
 matrixC DQ 2                    ; ROWS
         DQ 2                    ; COLS
-        DQ 0,0                 ; space for ROWS*COLS ints
-        DQ 0,0                ; (for filling in with matrixA*matrixB)
+        DQ 0, 0                 ; space for ROWS*COLS ints
+        DQ 0, 0                 ; (for filling in with matrixA*matrixB)
 
 ; ---------------------------------------------------------------------
 
@@ -383,3 +377,4 @@ matrixC DQ 2                    ; ROWS
         ;
         ; space in I/O-accessible segment for 1-octet output buffer
 octetbuffer     DQ 0            ; (qword as choice of size on stack)
+
