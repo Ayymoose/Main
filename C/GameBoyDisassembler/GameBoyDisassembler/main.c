@@ -10,6 +10,8 @@ struct opcode** opcodeMapCB;
 
 typedef unsigned char byte; //Should be globally defined TEST2
 
+SOME NEW CODE FROM BRANCH1
+
 //GameBoy begins executing instructions at 0x100 in memory
 #define INSTRUCTION_EXECUTION_ADDRESS 0x100
 #define PREFIX_CB 0xCB
