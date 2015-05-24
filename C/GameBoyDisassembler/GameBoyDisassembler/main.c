@@ -8,7 +8,7 @@ struct opcode** opcodeMapCB;
 
 #pragma warning (disable : 4996)
 
-typedef unsigned char byte; //Should be globally defined TEST
+typedef unsigned char byte; //Should be globally defined TEST2
 
 //GameBoy begins executing instructions at 0x100 in memory
 #define INSTRUCTION_EXECUTION_ADDRESS 0x100
