@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "opcode.h"
 
+SOME LINE OF CODE FROM BRANCH2
 
 struct opcode** opcodeMapMain;
 struct opcode** opcodeMapCB;
