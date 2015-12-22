@@ -21,15 +21,15 @@ void printArray(int *array, int length) {
   printf("%d]\n",array[length-1]);
 }
 
-/*
- * Problem: This current algorithm finds which plants are alive at the end but doesn't tell us how many days after all plants are still alive
- */
 
+//Bug in this code
+//Does not check if array[currentPlant] is 0 before comparison
 void plantsAlive(int *array, int length,int currentPlant, int nextPlant,int savedPlant,int poisonousPlants) {
 
   //Find the poisonous plants
   while (nextPlant<=length-1) {
     if (array[currentPlant] >= array[nextPlant]) {
+
       if (array[nextPlant] != 0) {
         if (savedPlant == 0) {
           currentPlant++;
@@ -47,9 +47,10 @@ void plantsAlive(int *array, int length,int currentPlant, int nextPlant,int save
       // Kill the plant
       array[nextPlant] = 0;
       printf("Poisonous plant: %d\n",nextPlant+1);
+      printArray(array,length);
       plantsAlive(array,length, currentPlant,nextPlant+1,savedPlant,poisonousPlants);
-      printf("# Plants: %d\n",poisonousPlants);
     }
+
   }
 
 
@@ -72,14 +73,18 @@ int checkPoisonousPlants(int *array, int length) {
   int nextPlant = 1;
   int poisonousPlants = NONE;
 
+  //Easier to assign currentPlant to nextPlant then have nextPlant++
+
   while (nextPlant <= length - 1) {
     if (deadPlantPesticide > 0) {
-      if (deadPlantPesticide > array[nextPlant]) {
-        deadPlantPesticide = 0;
-      } else {
-        killPlant(array, &poisonousPlants, &deadPlantPesticide, nextPlant);
+      if (array[nextPlant] != DEAD) {
+        if (deadPlantPesticide >= array[nextPlant]) {
+          deadPlantPesticide = 0;
+        } else {
+          killPlant(array, &poisonousPlants, &deadPlantPesticide, nextPlant);
+        }
+        currentPlant++;
       }
-      currentPlant++;
       nextPlant++;
     } else {
       if (array[currentPlant] == DEAD || array[nextPlant] == DEAD) {
@@ -89,8 +94,7 @@ int checkPoisonousPlants(int *array, int length) {
         if (array[currentPlant] < array[nextPlant]) {
           killPlant(array, &poisonousPlants, &deadPlantPesticide, nextPlant);
         }
-        currentPlant++;
-        nextPlant++;
+        currentPlant=nextPlant++;
       }
     }
   }
@@ -99,6 +103,42 @@ int checkPoisonousPlants(int *array, int length) {
 
 
 int main() {
+
+
+  /*
+   * 17
+     20 5 6 15 2 2 17 2 11 5 14 5 10 9 19 12 5
+     Answer = 4
+   */
+
+ // int plants[] = {20 ,5, 6, 15, 2 ,2 ,17 ,2 ,11, 5 ,14 ,5 ,10 ,9 ,19 ,12 ,5};
+
+  /*
+   * Day 1 (7 dead) 20 5 - - 2 2 - 2 - 5 - 5 - 9 - 12 5
+   * Day 2 (3 dead) 20 5 _ _ 2 2 _ 2 _ 5 _ 5 _ 9 _ 12 5
+   * Day 3 (4 dead) 20 5 _ _ 2 2 _ 2 _ _ _ _ _ _ _ _ 5
+   * Day 4 20 5 _ _ 2 2 _ 2 _ _ _ _ _ _ _ _ _
+   *
+   */
+
+  /*int days = 0;
+  int poisonousPlants = checkPoisonousPlants(plants,sizeof(plants)/sizeof(plants[0]));
+  printf("%d\n",poisonousPlants);
+  poisonousPlants = checkPoisonousPlants(plants,sizeof(plants)/sizeof(plants[0]));
+  printf("%d\n",poisonousPlants);
+  poisonousPlants = checkPoisonousPlants(plants,sizeof(plants)/sizeof(plants[0]));
+  printf("%d\n",poisonousPlants);
+  poisonousPlants = checkPoisonousPlants(plants,sizeof(plants)/sizeof(plants[0]));
+  printf("%d\n",poisonousPlants);
+  poisonousPlants = checkPoisonousPlants(plants,sizeof(plants)/sizeof(plants[0]));
+  printf("%d\n",poisonousPlants);*/
+
+  /*while(checkPoisonousPlants(plants,sizeof(plants)/sizeof(plants[0]))) {
+    days++;
+  }*/
+
+
+  //plantsAlive(plants,sizeof(plants)/sizeof(plants[0]),0,1,0,0);
 
 
   int n = 0;
