@@ -40,8 +40,33 @@ void symmetricise(array2D *array) {
 
 }
 
+/* Decomposes the matrix A into QR */
+QR* QRdecompose(array2D *A) {
+
+  /* Using the Gram-Schmidt process */
+
+  QR* qr = malloc(sizeof(QR));
+  array2D *Q = create2DArray((TYPE*)malloc(A->cols*A->rows*sizeof(TYPE)),A->rows,A->cols);
+  array2D *R = create2DArray((TYPE*)malloc(A->cols*A->rows*sizeof(TYPE)),A->rows,A->cols);
+  qr->Q = Q;
+  qr->R = R;
+
+  /* Obtain the orthonormal basis A */
+
+  for (int i=0; i<A->cols; i++) {
+
+    for (int j=0; j<=i; j++) {
+
+    }
+
+  }
+
+
+  return qr;
+}
+
 /* Creates a 2D array and returns a pointer to the struct */
-array2D* create2DArray(double *array, int rows, int cols) {
+array2D* create2DArray(TYPE *array, int rows, int cols) {
   array2D *ary = malloc(sizeof(array2D));
   ary->array = array;
   ary->rows = rows;
@@ -54,9 +79,9 @@ void printMatrix(array2D *arry) {
   for (int row = 0; row < arry->rows; row++) {
     printf("[");
     for (int col = 0; col < arry->cols - 1; col++) {
-      printf("%f, ", arry->array[row * arry->cols + col]);
+      printf(FLAG", ", arry->array[row * arry->cols + col]);
     }
-    printf("%f", arry->array[row * arry->cols + arry->cols - 1]);
+    printf(FLAG, arry->array[row * arry->cols + arry->cols - 1]);
     printf("]\n");
   }
 }
