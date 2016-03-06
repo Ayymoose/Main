@@ -6,7 +6,8 @@
  */
 
 #include "matrix.h"
-#include "vector.h"
+//#include "vector.h"
+
 #include <assert.h>
 #include <time.h>
 #include <stdio.h>
@@ -19,22 +20,24 @@ void symmetricise(matrix *array) {
 
   srand(time(NULL));
 
-  /* Randomise each value in the array */
+  /* Randomise only the upper or lower triangluar */
+
+  int c = 1;
   for (int row = 0; row < array->rows; row++) {
-    for (int col = 0; col < array->cols; col++) {
+    for (int col = c; col < array->cols; col++) {
       int r = (((RAND_MAX - rand()) % RANGE) + rand()) % RANGE;
-      array->array[index(row, col, array->cols)] = r;
+      array->array[col][row] = r;
     }
+    c++;
   }
 
   /* Makes array[row][col] = array[col][row] */
   /* Only to need to swap the upper or lower triangular */
 
-  int c = 1;
+  c = 1;
   for (int row = 0; row < array->rows; row++) {
     for (int col = c; col < array->cols; col++) {
-      array->array[index(row, col, array->cols)] = array->array[index(col, row,
-          array->cols)];
+      array->array[row][col] = array->array[col][row];
     }
     c++;
   }
@@ -48,7 +51,7 @@ matrix* matrix_multiply(matrix *m1, matrix *m2) {
   assert(m1->cols == m2->rows);
 
   /* Result matrix */
-  matrix *m3 = create_matrix((TYPE*)malloc(m1->rows * m2->cols * sizeof(TYPE)),m1->rows,m2->cols);
+  matrix *m3 = create_matrix((TYPE**)malloc(sizeof(TYPE*) * m1->cols),m1->rows,m2->cols);
 
   TYPE sum = 0;
 
@@ -56,9 +59,9 @@ matrix* matrix_multiply(matrix *m1, matrix *m2) {
   for (int row=0; row<m1->rows; row++) {
     for (int col=0; col<m2->cols; col++) {
       for (int k=0; k<m1->cols; k++) {
-        sum += m1->array[index(k,col,m1->cols)] * m2->array[index(row,k,m2->cols)];
+        sum += m1->array[k][col] * m2->array[row][k];
       }
-      m3->array[index(row,col,m3->cols)] = sum;
+      m3->array[row][col] = sum;
       sum = 0;
     }
   }
@@ -66,14 +69,17 @@ matrix* matrix_multiply(matrix *m1, matrix *m2) {
 }
 
 /* Matrix transpose */
-matrix* transpose(matrix* m) {
-  matrix *mt = create_matrix((TYPE*)malloc(m->rows*m->cols*sizeof(TYPE)),m->cols,m->rows);
-  for (int row=0; row<m->rows; row++) {
-    for (int col=0; col<m->cols; col++) {
-      mt->array[index(col,row,mt->cols)] = m->array[index(row,col,m->cols)];
+matrix* matrix_transpose(matrix* m) {
+  /* Swap indices across the diagonal */
+  /* Avoids malloc'ing more memory */
+  int c = 1;
+  for (int row = 0; row < m->rows; row++) {
+    for (int col = c; col < m->cols; col++) {
+      swap(m,row,col,col,row);
     }
+    c++;
   }
-  return mt;
+  return m;
 }
 
 /* Decomposes the matrix A into QR */
@@ -81,14 +87,14 @@ QR* QRdecompose(matrix *A) {
 
   /* Using the Gram-Schmidt process */
 
-  QR* qr = malloc(sizeof(QR));
+  //QR* qr = malloc(sizeof(QR));
 
-  vector **Q = malloc(sizeof(vector*) * A->cols);
+  //vector **Q = malloc(sizeof(vector*) * A->cols);
 
-  matrix *R = create_matrix((TYPE*) malloc(A->cols * A->rows * sizeof(TYPE)),
-      A->rows, A->cols);
-  qr->Q = Q;
-  qr->R = R;
+  //matrix *R = create_matrix((TYPE*) malloc(A->cols * A->rows * sizeof(TYPE)),
+      //A->rows, A->cols);
+  //qr->Q = Q;
+  //qr->R = R;
 
   /* Obtain the orthonormal basis A */
 
@@ -96,7 +102,7 @@ QR* QRdecompose(matrix *A) {
 
   for (int i = 0; i < A->cols; i++) {
 
-    vector *q = vector_from_column(A,i);
+    //vector *q = vector_from_column(A,i);
 
     for (int j = 0; j <= i; j++) {
 
@@ -104,34 +110,86 @@ QR* QRdecompose(matrix *A) {
 
     }
 
-    R->array[index(i,i,A->cols)] = vector_length(q);
-    q = vector_div(q,vector_length(q));
+   // R->array[index(i,i,A->cols)] = vector_length(q);
+    //q = vector_div(q,vector_length(q));
 
     //Put in Q
-    Q[i] = q;
+    //Q[i] = q;
 
   }
 
-  return qr;
+  return NULL;//qr;
 }
 
-/* Creates a 2D array and returns a pointer to the struct */
-matrix* create_matrix(TYPE *array, int rows, int cols) {
-  matrix *ary = malloc(sizeof(matrix));
-  ary->array = array;
-  ary->rows = rows;
-  ary->cols = cols;
-  return ary;
+/* Creates a matrix and returns a pointer to the struct */
+matrix* create_matrix(TYPE **m, int rows, int cols) {
+  matrix *array = malloc(sizeof(matrix));
+
+  /* Assuming the m is malloc'ed */
+  array->array = m;
+
+  for (int i=0; i<cols; i++) {
+    array->array[i] = malloc(sizeof(TYPE) * cols);
+  }
+
+  array->rows = rows;
+  array->cols = cols;
+  return array;
+}
+
+/* Creates a matrix from a stack based array and returns a pointer to the struct */
+matrix* create_matrix_from_array(int rows, int cols, TYPE m[][cols]) {
+  matrix *array = malloc(sizeof(matrix));
+
+  /* Allocate memory for the matrix */
+  array->array = malloc(sizeof(TYPE*) * rows);
+
+  /* Allocate memory for each array inside the matrix */
+  for (int i=0; i<rows; i++) {
+    array->array[i] = malloc(sizeof(TYPE) * cols);
+  }
+
+  /* Populate the matrix with m's values */
+  for (int row = 0; row < rows; row++) {
+    for (int col = 0; col < cols; col++) {
+      array->array[row][col] = m[row][col];
+    }
+  }
+
+  array->rows = rows;
+  array->cols = cols;
+  return array;
+}
+
+/* Swaps the values at the matrix index */
+/* swaps m[r1][c1] with m[r2][c2] */
+void swap(matrix *m, int r1, int c1, int r2, int c2) {
+  /* Remove assert for performance */
+  assert(r1 >= 0 && c1 >= 0 && r1 < m->rows && c1 < m->cols);
+  assert(r2 >= 0 && c2 >= 0 && r2 < m->rows && c2 < m->cols);
+
+  TYPE temp = m->array[r1][c1];
+  m->array[r1][c1] = m->array[r2][c2];
+  m->array[r2][c2] = temp;
+}
+
+/* Frees a matrix */
+void free_matrix(matrix *m) {
+  /* Frees the elements inside the matrix */
+  for (int i = 0; i<m->cols; i++) {
+    free(m->array[i]);
+  }
+  free(m->array);
 }
 
 /* Debugging purposes only */
-void print_matrix(matrix *arry) {
-  for (int row = 0; row < arry->rows; row++) {
+void print_matrix(matrix *m) {
+  for (int row = 0; row < m->rows; row++) {
     printf("[");
-    for (int col = 0; col < arry->cols - 1; col++) {
-      printf(FLAG", ", arry->array[row * arry->cols + col]);
+    for (int col = 0; col < m->cols - 1; col++) {
+      printf(FLAG", ", m->array[row][col]);
     }
-    printf(FLAG, arry->array[row * arry->cols + arry->cols - 1]);
+    printf(FLAG, m->array[row][m->cols-1]);
     printf("]\n");
   }
 }

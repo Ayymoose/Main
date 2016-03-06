@@ -31,7 +31,7 @@ vector* vector_from_column(matrix *array,int column) {
   vec->vector = malloc(sizeof(vec->size * sizeof(TYPE)));
 
   for (int row=0; row<vec->size; row++) {
-    vec->vector[row] = array->array[index(row,column,vec->size)];
+    //vec->vector[row] = array->array[index(row,column,vec->size)];
   }
   return vec;
 }
