@@ -25,7 +25,7 @@ vector* createVector(TYPE *array, int size) {
 }
 
 /* Create a vector from an array column */
-vector* vectorFromColumn(array2D *array,int column) {
+vector* vectorFromColumn(matrix *array,int column) {
 
   assert(column < array->rows);
 
@@ -49,11 +49,28 @@ double vectorLength(vector *vec) {
 }
 
 /* Normalises a vector */
-void normalise(vector *vec) {
+vector* normalise(vector *vec) {
   double length = vectorLength(vec);
   for (int i=0; i<vec->size; i++) {
     vec->vector[i] /= length;
   }
+  return vec;
+}
+
+/* Subtracts two vectors */
+vector* sub(vector *v1, vector *v2) {
+  for (int i=0; i<v1->size; i++) {
+    v1->vector[i] -= v2->vector[i];
+  }
+  return v1;
+}
+
+/* Multiplies v by k */
+vector* mul(vector *v, TYPE k) {
+  for (int i=0; i<v->size; i++) {
+    v->vector[i] *= k;
+  }
+  return v;
 }
 
 /* Returns the dot product of v1 and v2 */

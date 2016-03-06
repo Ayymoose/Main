@@ -11,28 +11,34 @@
 #include "defines.h"
 
 typedef struct {
-  TYPE *array;  /* Pointer to a double */
+  TYPE *array;    /* Pointer to an array of type TYPE */
   int rows;       /* Number of rows */
   int cols;       /* Number of columns */
-} array2D;
+} matrix;
 
 typedef struct {
-  array2D *Q;  /* Orthogonal matrix Q */
-  array2D *R;  /* Right upper triangular matrix R */
+  matrix *Q;  /* Orthogonal matrix Q */
+  matrix *R;  /* Right upper triangular matrix R */
 } QR;
 
 /* Creates a random symmetric matrix A from arry passed in */
-void symmetricise(array2D *array);
+void symmetricise(matrix *matrix);
 
 /* Creates a 2D array and returns a pointer to the struct */
-array2D* create2DArray(TYPE *array, int rows, int cols);
+matrix* createMatrix(TYPE *matrix, int rows, int cols);
+
+/* Matrix multiplication */
+matrix* matrixMultiply(matrix *m1, matrix *m2);
+
+/* Matrix transpose */
+matrix* transpose(matrix* m);
 
 // DONT FORGET TO CALL FREE
 
 /* Decomposes the matrix A into QR (A = QR) */
-QR* QRdecompose(array2D *A);
+QR* QRdecompose(matrix *A);
 
 /* Print a matrix (Debugging purposes only) */
-void printMatrix(array2D *array);
+void printMatrix(matrix *matrix);
 
 #endif /* MATRIX_H_ */

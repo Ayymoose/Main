@@ -20,15 +20,17 @@ int main(int argc, const char **argv) {
       -4, 24, -41
   };
 
-  array2D *ary = create2DArray(a,3,3);
-  vector *v = vectorFromColumn(ary,0);
+  TYPE b[9] =
+    {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9
+    };
 
-  normalise(v);
+  matrix *ary = createMatrix(b,3,3);
+  matrix *c = transpose(ary);
 
-  printVector(v);
-
-  //symmetricise(ary);
-  printMatrix(ary);
+  printMatrix(c);
 
   return 0;
 }

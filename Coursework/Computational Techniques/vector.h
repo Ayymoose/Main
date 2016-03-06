@@ -21,14 +21,22 @@ typedef struct {
 /* Creates an arbitrary sized vector denoted by size elements */
 vector* createVector(TYPE *array, int size);
 
-/* Create a vector from an array column */
-vector* vectorFromColumn(array2D *array, int column);
+/* Create a vector from an m column */
+vector* vectorFromColumn(matrix *array, int column);
 
 /* Returns the length of a vector */
 double vectorLength(vector *vec);
 
 /* Normalises a vector */
-void normalise(vector *vec);
+vector* normalise(vector *vec);
+
+/* Subtracts two vectors (v1 - v2) */
+vector* sub(vector *v1, vector *v2);
+
+/* Multiplies v by k */
+vector* mul(vector *v, TYPE k);
+
+//vector* projectionThrough(vector *v,)
 
 /* Returns the dot product of v1 and v2 */
 TYPE dot(vector *v1, vector *v2);
