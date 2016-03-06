@@ -6,8 +6,7 @@
  */
 
 #include "matrix.h"
-//#include "vector.h"
-
+#include "math.h"
 #include <assert.h>
 #include <time.h>
 #include <stdio.h>
@@ -51,7 +50,7 @@ matrix* matrix_multiply(matrix *m1, matrix *m2) {
   assert(m1->cols == m2->rows);
 
   /* Result matrix */
-  matrix *m3 = create_matrix((TYPE**)malloc(sizeof(TYPE*) * m1->cols),m1->rows,m2->cols);
+  matrix *m3 = create_matrix(m1->rows,m2->cols);
 
   TYPE sum = 0;
 
@@ -68,18 +67,55 @@ matrix* matrix_multiply(matrix *m1, matrix *m2) {
   return m3;
 }
 
-/* Matrix transpose */
-matrix* matrix_transpose(matrix* m) {
-  /* Swap indices across the diagonal */
-  /* Avoids malloc'ing more memory */
-  int c = 1;
-  for (int row = 0; row < m->rows; row++) {
-    for (int col = c; col < m->cols; col++) {
-      swap(m,row,col,col,row);
+/* Tranposes a column matrix into a row matrix */
+matrix* matrix_transpose_column(matrix *m) {
+  /* Assuming m is a column matrix */
+  int t = m->cols;
+  m->cols = m->rows;
+  m->rows = t;
+  return m;
+}
+
+/* Duplicates a matrix
+matrix* matrix_duplicate(matrix *m) {
+  matrix *c = create_matrix((TYPE**)malloc(sizeof(TYPE*) * m->rows),m->rows, m->cols);
+  for (int row = 0; row<m->rows; row++) {
+    for (int col = 0; col<m->cols; col++) {
+      c->array[row][col] = m->array[row][col];
     }
-    c++;
+  }
+  return c;
+}*/
+
+/* Copies a matrix column from msrc at column col1 to mdst at column col2 */
+void matrix_copy_column(matrix *msrc, int col1, matrix *mdst,int col2) {
+  for (int i=0; i<msrc->rows; i++) {
+    mdst->array[i][col2] = msrc->array[i][col1];
+  }
+}
+/*
+/* Creates a matrix c from the column col of m
+matrix* matrix_create_from_column(matrix *m, int col) {
+  matrix *c = create_matrix((TYPE**)malloc(sizeof(TYPE*) * m->rows),m->rows, 1);
+  //matrix_copy_column(m, c,col);
+  return c;
+}*/
+
+/* Divides the matrix column c in m by k */
+matrix* matrix_divide(matrix *m, int c, TYPE k) {
+  for (int i=0; i<m->rows; i++) {
+    m->array[i][c] /= k;
   }
   return m;
+}
+
+/* Returns the length of the vector column in m */
+double vector_length(matrix *m,int column) {
+  double length = 0;
+  for (int row=0; row<m->rows; row++) {
+    length += m->array[row][column] * m->array[row][column];
+  }
+  return sqrt(length);
 }
 
 /* Decomposes the matrix A into QR */
@@ -87,53 +123,61 @@ QR* QRdecompose(matrix *A) {
 
   /* Using the Gram-Schmidt process */
 
-  //QR* qr = malloc(sizeof(QR));
+  QR* qr = malloc(sizeof(QR));
+  matrix *Q = create_matrix(A->rows, A->cols);
+  matrix *R = create_matrix(A->rows, A->cols);
+  qr->Q = Q;
+  qr->R = R;
 
-  //vector **Q = malloc(sizeof(vector*) * A->cols);
+  /* Temporary vector T and S used in calculations */
+  matrix *T = create_matrix(A->rows, 1);
+  matrix *S = create_matrix(A->rows, 1);
 
-  //matrix *R = create_matrix((TYPE*) malloc(A->cols * A->rows * sizeof(TYPE)),
-      //A->rows, A->cols);
-  //qr->Q = Q;
-  //qr->R = R;
-
-  /* Obtain the orthonormal basis A */
-
+  //print_matrix(T);
 
 
   for (int i = 0; i < A->cols; i++) {
 
-    //vector *q = vector_from_column(A,i);
+    //Qi = Ui
+    matrix_copy_column(A,i,Q,i);
 
     for (int j = 0; j <= i; j++) {
 
-      //R->array[index(j,i,R->cols)] =
+      //r[j,i] = Qj^T * Ui
+      //matrix_copy_column(Q,j,T,0);
+      //matrix_copy_column(A,S,i);
+      //R->array[j][i] = matrix_multiply(matrix_transpose_column(T),S)->array[0][0];
+
 
     }
 
-   // R->array[index(i,i,A->cols)] = vector_length(q);
-    //q = vector_div(q,vector_length(q));
-
-    //Put in Q
-    //Q[i] = q;
+    //r[i,i] = ||Qi||
+    R->array[i][i] = vector_length(Q,i);
+    //Qi = Qi/r[i,i]
+    matrix_divide(Q,i,R->array[i][i]);
 
   }
 
-  return NULL;//qr;
+  return qr;
 }
 
 /* Creates a matrix and returns a pointer to the struct */
-matrix* create_matrix(TYPE **m, int rows, int cols) {
+matrix* create_matrix(int rows, int cols) {
+
+  /* Allocate memory for the matrix struct */
   matrix *array = malloc(sizeof(matrix));
-
-  /* Assuming the m is malloc'ed */
-  array->array = m;
-
-  for (int i=0; i<cols; i++) {
-    array->array[i] = malloc(sizeof(TYPE) * cols);
-  }
 
   array->rows = rows;
   array->cols = cols;
+
+  /* Allocate enough memory for all the rows in the first matrix */
+  array->array = calloc(rows, sizeof(TYPE*));
+
+  /* Enough memory for all the columns */
+  for (int i=0; i<rows; i++) {
+    array->array[i] = calloc(cols,sizeof(TYPE));
+  }
+
   return array;
 }
 

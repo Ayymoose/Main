@@ -37,22 +37,22 @@ vector* vector_from_column(matrix *array,int column) {
 }
 
 /* Returns the length of a vector */
-double vector_length(vector *vec) {
+/*double vector_length(vector *vec) {
   double length = 0;
   for (int i=0; i<vec->size; i++) {
     length += vec->vector[i] * vec->vector[i];
   }
   return sqrt(length);
-}
+}*/
 
 /* Normalises a vector */
-vector* normalise(vector *vec) {
+/*vector* normalise(vector *vec) {
   double length = vector_length(vec);
   for (int i=0; i<vec->size; i++) {
     vec->vector[i] /= length;
   }
   return vec;
-}
+}*/
 
 /* Subtracts two vectors */
 vector* vector_sub(vector *v1, vector *v2) {

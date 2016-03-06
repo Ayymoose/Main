@@ -8,7 +8,7 @@
 #ifndef DEBUG_DEFINES_H_
 #define DEBUG_DEFINES_H_
 
-#define TYPE int
-#define FLAG "%d"
+#define TYPE double
+#define FLAG "%f"
 
 #endif /* DEBUG_DEFINES_H_ */

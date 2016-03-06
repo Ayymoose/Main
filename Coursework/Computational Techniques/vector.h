@@ -25,7 +25,7 @@ vector* create_vector(TYPE *array, int size);
 vector* vector_from_column(matrix *array, int column);
 
 /* Returns the length of a vector */
-double vector_length(vector *vec);
+//double vector_length(vector *vec);
 
 /* Normalises a vector */
 vector* normalise(vector *vec);

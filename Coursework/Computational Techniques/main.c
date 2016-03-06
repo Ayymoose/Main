@@ -71,30 +71,16 @@ int main(int argc, const char **argv) {
 
 
 
-  int a[3][1] =
-  {
-      {1},
-      {3},
-      {4},
-  };
+  TYPE a[3][3] = { { 12, -51, 4 }, { 6, 167, -68 }, { -4, 24, -41 }};
 
-  int b[1][4] =
-  {
-        {1,2,3,4},
-  };
 
-  //matrix *ary = create_matrix(b,1,3);
-  //matrix *c = transpose(ary);
+  matrix *T = create_matrix(1,3);
+  print_matrix(T);
 
-  matrix *m1 = create_matrix_from_array(3,1,a);
-  matrix *m2 = create_matrix_from_array(1,4,b);
-  matrix *m3 = matrix_multiply(m1,m2);
+  //matrix *A = create_matrix_from_array(3,3,a);
+  //QR *qr = QRdecompose(A);
+  //print_matrix(qr->Q);
 
-  print_matrix(m3);
-
-  free_matrix(m1);
-  free_matrix(m2);
-  free_matrix(m3);
 
 
   return 0;
