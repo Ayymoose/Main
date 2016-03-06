@@ -59,7 +59,7 @@ matrix* matrix_multiply(matrix *m1, matrix *m2) {
   for (int row=0; row<m1->rows; row++) {
     for (int col=0; col<m2->cols; col++) {
       for (int k=0; k<m1->cols; k++) {
-        sum += m1->array[k][col] * m2->array[row][k];
+        sum +=  m1->array[row][k] * m2->array[k][col];
       }
       m3->array[row][col] = sum;
       sum = 0;
@@ -174,12 +174,13 @@ void swap(matrix *m, int r1, int c1, int r2, int c2) {
 }
 
 /* Frees a matrix */
+/* BUG IN FREE MATRIX */
 void free_matrix(matrix *m) {
   /* Frees the elements inside the matrix */
   for (int i = 0; i<m->cols; i++) {
     free(m->array[i]);
   }
-  free(m->array);
+  free(m);
 }
 
 /* Debugging purposes only */
