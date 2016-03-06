@@ -9,6 +9,6 @@
 #define DEBUG_DEFINES_H_
 
 #define TYPE double
-#define FLAG "%f"
+#define FLAG "%7.3f"
 
 #endif /* DEBUG_DEFINES_H_ */

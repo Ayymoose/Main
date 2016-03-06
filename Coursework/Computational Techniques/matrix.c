@@ -67,46 +67,35 @@ matrix* matrix_multiply(matrix *m1, matrix *m2) {
   return m3;
 }
 
-/* Tranposes a column matrix into a row matrix */
-matrix* matrix_transpose_column(matrix *m) {
-  /* Assuming m is a column matrix */
-  int t = m->cols;
-  m->cols = m->rows;
-  m->rows = t;
-  return m;
-}
-
-/* Duplicates a matrix
-matrix* matrix_duplicate(matrix *m) {
-  matrix *c = create_matrix((TYPE**)malloc(sizeof(TYPE*) * m->rows),m->rows, m->cols);
-  for (int row = 0; row<m->rows; row++) {
-    for (int col = 0; col<m->cols; col++) {
-      c->array[row][col] = m->array[row][col];
-    }
-  }
-  return c;
-}*/
-
 /* Copies a matrix column from msrc at column col1 to mdst at column col2 */
 void matrix_copy_column(matrix *msrc, int col1, matrix *mdst,int col2) {
   for (int i=0; i<msrc->rows; i++) {
     mdst->array[i][col2] = msrc->array[i][col1];
   }
 }
-/*
-/* Creates a matrix c from the column col of m
-matrix* matrix_create_from_column(matrix *m, int col) {
-  matrix *c = create_matrix((TYPE**)malloc(sizeof(TYPE*) * m->rows),m->rows, 1);
-  //matrix_copy_column(m, c,col);
-  return c;
-}*/
 
 /* Divides the matrix column c in m by k */
-matrix* matrix_divide(matrix *m, int c, TYPE k) {
+matrix* matrix_column_divide(matrix *m, int c, TYPE k) {
   for (int i=0; i<m->rows; i++) {
     m->array[i][c] /= k;
   }
   return m;
+}
+
+/* Multiplies the matrix column c in m by k */
+matrix* matrix_column_multiply(matrix *m, int c, TYPE k) {
+  for (int i=0; i<m->rows; i++) {
+    m->array[i][c] *= k;
+  }
+  return m;
+}
+
+/* Subtracts m2's column c2 from m1's column c1 */
+matrix* matrix_column_subtract(matrix *m1, int c1, matrix *m2, int c2) {
+  for (int i=0; i<m1->rows; i++) {
+      m1->array[i][c1] -= m2->array[i][c2];
+  }
+  return m1;
 }
 
 /* Returns the length of the vector column in m */
@@ -133,9 +122,6 @@ QR* QRdecompose(matrix *A) {
   matrix *T = create_matrix(A->rows, 1);
   matrix *S = create_matrix(A->rows, 1);
 
-  //print_matrix(T);
-
-
   for (int i = 0; i < A->cols; i++) {
 
     //Qi = Ui
@@ -144,17 +130,26 @@ QR* QRdecompose(matrix *A) {
     for (int j = 0; j <= i; j++) {
 
       //r[j,i] = Qj^T * Ui
-      //matrix_copy_column(Q,j,T,0);
-      //matrix_copy_column(A,S,i);
-      //R->array[j][i] = matrix_multiply(matrix_transpose_column(T),S)->array[0][0];
+      matrix_copy_column(Q,j,T,0);
+      matrix_copy_column(A,i,S,0);
 
+      TYPE r = 0;
+      for (int k=0; k<A->rows; k++) {
+        r += T->array[k][0] * S->array[k][0];
+      }
+
+      R->array[j][i] = r;
+
+      //matrix *x = matrix_column_multiply(Q,j,r);
+
+      //matrix_column_subtract(Q,i,x,j);
 
     }
 
     //r[i,i] = ||Qi||
     R->array[i][i] = vector_length(Q,i);
     //Qi = Qi/r[i,i]
-    matrix_divide(Q,i,R->array[i][i]);
+    matrix_column_divide(Q,i,R->array[i][i]);
 
   }
 
@@ -183,7 +178,11 @@ matrix* create_matrix(int rows, int cols) {
 
 /* Creates a matrix from a stack based array and returns a pointer to the struct */
 matrix* create_matrix_from_array(int rows, int cols, TYPE m[][cols]) {
+
+  /* Allocate memory for the matrix struct */
   matrix *array = malloc(sizeof(matrix));
+  array->rows = rows;
+  array->cols = cols;
 
   /* Allocate memory for the matrix */
   array->array = malloc(sizeof(TYPE*) * rows);
@@ -200,8 +199,6 @@ matrix* create_matrix_from_array(int rows, int cols, TYPE m[][cols]) {
     }
   }
 
-  array->rows = rows;
-  array->cols = cols;
   return array;
 }
 
@@ -227,6 +224,11 @@ void free_matrix(matrix *m) {
   free(m);
 }
 
+/* Print the dimensions of a matrix (Debugging purposes only) */
+void print_dimensions(matrix *m) {
+  printf("%dx%d\n",m->rows,m->cols);
+}
+
 /* Debugging purposes only */
 void print_matrix(matrix *m) {
   for (int row = 0; row < m->rows; row++) {
@@ -237,4 +239,5 @@ void print_matrix(matrix *m) {
     printf(FLAG, m->array[row][m->cols-1]);
     printf("]\n");
   }
+  printf("\n");
 }
