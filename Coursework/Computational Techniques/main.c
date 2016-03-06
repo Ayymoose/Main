@@ -27,10 +27,10 @@ int main(int argc, const char **argv) {
         7, 8, 9
     };
 
-  matrix *ary = createMatrix(b,3,3);
+  matrix *ary = create_matrix(b,3,3);
   matrix *c = transpose(ary);
 
-  printMatrix(c);
+  print_matrix(c);
 
   return 0;
 }

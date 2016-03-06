@@ -5,43 +5,44 @@
  *      Author: Ayman
  */
 
-#include "math.h"
-#include "defines.h"
-#include "matrix.h"
-
 #ifndef VECTOR_H_
 #define VECTOR_H_
+
+#include "math.h"
+#include "defines.h"
 
 typedef struct {
   TYPE *vector; /* An arbitrary sized vector */
   int size;     /* That has size elements */
-  TYPE type;    /* malloc() purposes */
 } vector;
 
+#include "matrix.h"
+
 /* Creates an arbitrary sized vector denoted by size elements */
-vector* createVector(TYPE *array, int size);
+vector* create_vector(TYPE *array, int size);
 
 /* Create a vector from an m column */
-vector* vectorFromColumn(matrix *array, int column);
+vector* vector_from_column(matrix *array, int column);
 
 /* Returns the length of a vector */
-double vectorLength(vector *vec);
+double vector_length(vector *vec);
 
 /* Normalises a vector */
 vector* normalise(vector *vec);
 
 /* Subtracts two vectors (v1 - v2) */
-vector* sub(vector *v1, vector *v2);
+vector* vector_sub(vector *v1, vector *v2);
 
-/* Multiplies v by k */
-vector* mul(vector *v, TYPE k);
+/* Multiplies v by k (constant) */
+vector* vector_mul(vector *v, TYPE k);
 
-//vector* projectionThrough(vector *v,)
+/* Divides v by k (constant) */
+vector* vector_div(vector *v, TYPE k);
 
 /* Returns the dot product of v1 and v2 */
 TYPE dot(vector *v1, vector *v2);
 
 /* Print a vector (Debugging purposes only) */
-void printVector(vector* vec);
+void print_vector(vector* vec);
 
 #endif /* VECTOR_H_ */

@@ -10,5 +10,6 @@
 
 #define TYPE int
 #define FLAG "%d"
+#define index(ROW,COL,NUM_COLS) ((ROW * NUM_COLS) + COL)
 
 #endif /* DEBUG_DEFINES_H_ */

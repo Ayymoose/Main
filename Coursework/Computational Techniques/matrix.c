@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define index(ROW,COL,NUM_COLS) ((ROW * NUM_COLS) + COL)
 #define RANGE 25
 
 /* Creates a symmetrix matrix out of array */
@@ -43,13 +42,13 @@ void symmetricise(matrix *array) {
 }
 
 /* Matrix multiplication (m1 * m2) */
-matrix* matrixMultiply(matrix *m1, matrix *m2) {
+matrix* matrix_multiply(matrix *m1, matrix *m2) {
 
   /* Remove for performance */
   assert(m1->cols == m2->rows);
 
   /* Result matrix */
-  matrix *m3 = createMatrix((TYPE*)malloc(m1->rows * m2->cols * sizeof(TYPE)),m1->rows,m2->cols);
+  matrix *m3 = create_matrix((TYPE*)malloc(m1->rows * m2->cols * sizeof(TYPE)),m1->rows,m2->cols);
 
   TYPE sum = 0;
 
@@ -68,7 +67,7 @@ matrix* matrixMultiply(matrix *m1, matrix *m2) {
 
 /* Matrix transpose */
 matrix* transpose(matrix* m) {
-  matrix *mt = createMatrix((TYPE*)malloc(m->rows*m->cols*sizeof(TYPE)),m->cols,m->rows);
+  matrix *mt = create_matrix((TYPE*)malloc(m->rows*m->cols*sizeof(TYPE)),m->cols,m->rows);
   for (int row=0; row<m->rows; row++) {
     for (int col=0; col<m->cols; col++) {
       mt->array[index(col,row,mt->cols)] = m->array[index(row,col,m->cols)];
@@ -83,9 +82,10 @@ QR* QRdecompose(matrix *A) {
   /* Using the Gram-Schmidt process */
 
   QR* qr = malloc(sizeof(QR));
-  matrix *Q = createMatrix((TYPE*) malloc(A->cols * A->rows * sizeof(TYPE)),
-      A->rows, A->cols);
-  matrix *R = createMatrix((TYPE*) malloc(A->cols * A->rows * sizeof(TYPE)),
+
+  vector **Q = malloc(sizeof(vector*) * A->cols);
+
+  matrix *R = create_matrix((TYPE*) malloc(A->cols * A->rows * sizeof(TYPE)),
       A->rows, A->cols);
   qr->Q = Q;
   qr->R = R;
@@ -93,17 +93,22 @@ QR* QRdecompose(matrix *A) {
   /* Obtain the orthonormal basis A */
 
 
+
   for (int i = 0; i < A->cols; i++) {
 
-
+    vector *q = vector_from_column(A,i);
 
     for (int j = 0; j <= i; j++) {
 
-
+      //R->array[index(j,i,R->cols)] =
 
     }
 
+    R->array[index(i,i,A->cols)] = vector_length(q);
+    q = vector_div(q,vector_length(q));
 
+    //Put in Q
+    Q[i] = q;
 
   }
 
@@ -111,7 +116,7 @@ QR* QRdecompose(matrix *A) {
 }
 
 /* Creates a 2D array and returns a pointer to the struct */
-matrix* createMatrix(TYPE *array, int rows, int cols) {
+matrix* create_matrix(TYPE *array, int rows, int cols) {
   matrix *ary = malloc(sizeof(matrix));
   ary->array = array;
   ary->rows = rows;
@@ -120,7 +125,7 @@ matrix* createMatrix(TYPE *array, int rows, int cols) {
 }
 
 /* Debugging purposes only */
-void printMatrix(matrix *arry) {
+void print_matrix(matrix *arry) {
   for (int row = 0; row < arry->rows; row++) {
     printf("[");
     for (int col = 0; col < arry->cols - 1; col++) {

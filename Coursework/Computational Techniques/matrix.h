@@ -5,6 +5,7 @@
  *      Author: Ayman
  */
 
+
 #ifndef MATRIX_H_
 #define MATRIX_H_
 
@@ -16,8 +17,13 @@ typedef struct {
   int cols;       /* Number of columns */
 } matrix;
 
+
+#include "vector.h"
+
+
+
 typedef struct {
-  matrix *Q;  /* Orthogonal matrix Q */
+  vector **Q;  /* Orthogonal matrix Q */
   matrix *R;  /* Right upper triangular matrix R */
 } QR;
 
@@ -25,10 +31,10 @@ typedef struct {
 void symmetricise(matrix *matrix);
 
 /* Creates a 2D array and returns a pointer to the struct */
-matrix* createMatrix(TYPE *matrix, int rows, int cols);
+matrix* create_matrix(TYPE *matrix, int rows, int cols);
 
 /* Matrix multiplication */
-matrix* matrixMultiply(matrix *m1, matrix *m2);
+matrix* matrix_multiply(matrix *m1, matrix *m2);
 
 /* Matrix transpose */
 matrix* transpose(matrix* m);
@@ -39,6 +45,6 @@ matrix* transpose(matrix* m);
 QR* QRdecompose(matrix *A);
 
 /* Print a matrix (Debugging purposes only) */
-void printMatrix(matrix *matrix);
+void print_matrix(matrix *matrix);
 
 #endif /* MATRIX_H_ */
