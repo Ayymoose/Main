@@ -74,7 +74,7 @@ matrix* matrix_column_subtract(matrix *m1, int c1, matrix *m2, int c2) {
   return m1;
 }
 
-/* Returns the length of the vector column in m */
+/* Returns the length of the matrix column in m */
 double vector_length(matrix *m,int column) {
   double length = 0;
   for (int row=0; row<m->rows; row++) {
