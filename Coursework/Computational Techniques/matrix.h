@@ -26,9 +26,6 @@ matrix* create_matrix(int rows, int cols);
 /* Creates a matrix from a stack based array and returns a pointer to the struct */
 matrix* create_matrix_from_array(int rows, int cols, TYPE m[][cols]);
 
-/* Matrix multiplication */
-matrix* matrix_multiply(matrix *m1, matrix *m2);
-
 /* Tranposes a column matrix into a row matrix */
 matrix* matrix_transpose_column(matrix *m);
 

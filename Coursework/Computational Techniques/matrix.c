@@ -17,12 +17,12 @@
 /* Creates a random symmetrix matrix */
 matrix* symmetricise(matrix *m) {
 
+  /* Does not affect the matrix diagonal so creating an empty matrix will have 0s on the diagonal*/
+
   srand(time(NULL));
 
   /* Randomise only the upper or lower triangluar */
-
-  int c = 1;
-  for (int row = 0; row < m->rows; row++) {
+  for (int row = 0,c = 1; row < m->rows; row++) {
     for (int col = c; col < m->cols; col++) {
       int r = (((RAND_MAX - rand()) % RANGE) + rand()) % RANGE;
       m->array[col][row] = r;
@@ -33,8 +33,7 @@ matrix* symmetricise(matrix *m) {
   /* Makes array[row][col] = array[col][row] */
   /* Only to need to swap the upper or lower triangular */
 
-  c = 1;
-  for (int row = 0; row < m->rows; row++) {
+  for (int row = 0,c=1; row < m->rows; row++) {
     for (int col = c; col < m->cols; col++) {
       m->array[row][col] = m->array[col][row];
     }
@@ -42,30 +41,6 @@ matrix* symmetricise(matrix *m) {
   }
 
   return m;
-}
-
-/* Matrix multiplication (m1 * m2) */
-matrix* matrix_multiply(matrix *m1, matrix *m2) {
-
-  /* Remove for performance */
-  assert(m1->cols == m2->rows);
-
-  /* Result matrix */
-  matrix *m3 = create_matrix(m1->rows,m2->cols);
-
-  TYPE sum = 0;
-
-  /* Naive multiplication */
-  for (int row=0; row<m1->rows; row++) {
-    for (int col=0; col<m2->cols; col++) {
-      for (int k=0; k<m1->cols; k++) {
-        sum +=  m1->array[row][k] * m2->array[k][col];
-      }
-      m3->array[row][col] = sum;
-      sum = 0;
-    }
-  }
-  return m3;
 }
 
 /* Copies a matrix column from msrc at column col1 to mdst at column col2 */
@@ -135,6 +110,8 @@ void QRdecompose(matrix *A, matrix *Q, matrix *R) {
       }
       R->array[j][i] = r;
       matrix_column_subtract(Q,i,matrix_column_multiply(T,0,r),0);
+      //
+
     }
 
     //r[i,i] = ||Qi||
@@ -153,7 +130,6 @@ matrix* create_matrix(int rows, int cols) {
 
   /* Allocate memory for the matrix struct */
   matrix *array = malloc(sizeof(matrix));
-
   array->rows = rows;
   array->cols = cols;
 
@@ -171,18 +147,8 @@ matrix* create_matrix(int rows, int cols) {
 /* Creates a matrix from a stack based array and returns a pointer to the struct */
 matrix* create_matrix_from_array(int rows, int cols, TYPE m[][cols]) {
 
-  /* Allocate memory for the matrix struct */
-  matrix *array = malloc(sizeof(matrix));
-  array->rows = rows;
-  array->cols = cols;
-
-  /* Allocate memory for the matrix */
-  array->array = malloc(sizeof(TYPE*) * rows);
-
-  /* Allocate memory for each array inside the matrix */
-  for (int i=0; i<rows; i++) {
-    array->array[i] = malloc(sizeof(TYPE) * cols);
-  }
+  /* Create an empty matrix */
+  matrix *array = create_matrix(rows,cols);
 
   /* Populate the matrix with m's values */
   for (int row = 0; row < rows; row++) {
@@ -194,20 +160,7 @@ matrix* create_matrix_from_array(int rows, int cols, TYPE m[][cols]) {
   return array;
 }
 
-/* Swaps the values at the matrix index */
-/* swaps m[r1][c1] with m[r2][c2] */
-void swap(matrix *m, int r1, int c1, int r2, int c2) {
-  /* Remove assert for performance */
-  assert(r1 >= 0 && c1 >= 0 && r1 < m->rows && c1 < m->cols);
-  assert(r2 >= 0 && c2 >= 0 && r2 < m->rows && c2 < m->cols);
-
-  TYPE temp = m->array[r1][c1];
-  m->array[r1][c1] = m->array[r2][c2];
-  m->array[r2][c2] = temp;
-}
-
 /* Frees a matrix */
-/* BUG IN FREE MATRIX */
 void free_matrix(matrix *m) {
   /* Frees the elements inside the matrix */
   for (int i = 0; i<m->cols; i++) {

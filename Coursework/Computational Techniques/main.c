@@ -27,6 +27,12 @@ int main(int argc, const char **argv) {
   print_matrix(R);*/
 
 
+  matrix *m = create_matrix(4,4);
+  symmetricise(m);
+  print_matrix(m);
+  free_matrix(m);
+
+
 
   return 0;
 }
