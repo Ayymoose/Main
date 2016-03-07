@@ -12,18 +12,13 @@
 #include "defines.h"
 
 typedef struct {
-  TYPE **array;    /* Pointer to an array of type TYPE */
+  TYPE **array;   /* Pointer to an array of type TYPE */
   int rows;       /* Number of rows */
   int cols;       /* Number of columns */
 } matrix;
 
-typedef struct {
-  matrix *Q;  /* Orthogonal matrix Q */
-  matrix *R;  /* Right upper triangular matrix R */
-} QR;
-
-/* Creates a random symmetric matrix A from arry passed in */
-void symmetricise(matrix *m);
+/* Creates a random symmetrix matrix */
+matrix* symmetricise(matrix *m);
 
 /* Creates a matrix and returns a pointer to the struct */
 matrix* create_matrix(int rows, int cols);
@@ -46,7 +41,6 @@ matrix* matrix_column_multiply(matrix *m, int c, TYPE k);
 /* Subtracts m2's column c2 from m1's column c1 */
 matrix* matrix_column_subtract(matrix *m1, int c1, matrix *m2, int c2);
 
-
 /* Swaps the values at the matrix index */
 /* swaps m[r1][c1] with m[r2][c2] */
 void swap(matrix *m, int r1, int c1, int r2, int c2);
@@ -60,11 +54,8 @@ double vector_length(matrix *m, int column);
 /* Frees a matrix */
 void free_matrix(matrix *m);
 
-/* Decomposes the matrix A into QR (A = QR) */
-QR* QRdecompose(matrix *A);
-
-/* Print the dimensions of a matrix (Debugging purposes only) */
-void print_dimensions(matrix *m);
+/* Decomposes the matrix A into QR */
+void QRdecompose(matrix *A, matrix *Q, matrix *R);
 
 /* Print a matrix (Debugging purposes only) */
 void print_matrix(matrix *m);

@@ -14,18 +14,18 @@
 
 #define RANGE 25
 
-/* Creates a symmetrix matrix out of array */
-void symmetricise(matrix *array) {
+/* Creates a random symmetrix matrix */
+matrix* symmetricise(matrix *m) {
 
   srand(time(NULL));
 
   /* Randomise only the upper or lower triangluar */
 
   int c = 1;
-  for (int row = 0; row < array->rows; row++) {
-    for (int col = c; col < array->cols; col++) {
+  for (int row = 0; row < m->rows; row++) {
+    for (int col = c; col < m->cols; col++) {
       int r = (((RAND_MAX - rand()) % RANGE) + rand()) % RANGE;
-      array->array[col][row] = r;
+      m->array[col][row] = r;
     }
     c++;
   }
@@ -34,13 +34,14 @@ void symmetricise(matrix *array) {
   /* Only to need to swap the upper or lower triangular */
 
   c = 1;
-  for (int row = 0; row < array->rows; row++) {
-    for (int col = c; col < array->cols; col++) {
-      array->array[row][col] = array->array[col][row];
+  for (int row = 0; row < m->rows; row++) {
+    for (int col = c; col < m->cols; col++) {
+      m->array[row][col] = m->array[col][row];
     }
     c++;
   }
 
+  return m;
 }
 
 /* Matrix multiplication (m1 * m2) */
@@ -108,17 +109,11 @@ double vector_length(matrix *m,int column) {
 }
 
 /* Decomposes the matrix A into QR */
-QR* QRdecompose(matrix *A) {
+void QRdecompose(matrix *A, matrix *Q, matrix *R) {
 
   /* Using the Gram-Schmidt process */
 
-  QR* qr = malloc(sizeof(QR));
-  matrix *Q = create_matrix(A->rows, A->cols);
-  matrix *R = create_matrix(A->rows, A->cols);
-  qr->Q = Q;
-  qr->R = R;
-
-  /* Temporary vector T and S used in calculations */
+  /* Temporary matrices T and S used in calculations */
   matrix *T = create_matrix(A->rows, 1);
   matrix *S = create_matrix(A->rows, 1);
 
@@ -127,33 +122,30 @@ QR* QRdecompose(matrix *A) {
     //Qi = Ui
     matrix_copy_column(A,i,Q,i);
 
-    for (int j = 0; j <= i; j++) {
+    for (int j = 0; j < i; j++) {
 
       //r[j,i] = Qj^T * Ui
       matrix_copy_column(Q,j,T,0);
       matrix_copy_column(A,i,S,0);
-
       TYPE r = 0;
+
+      // Compute the multiplication of two Nx1 1xN matrices
       for (int k=0; k<A->rows; k++) {
         r += T->array[k][0] * S->array[k][0];
       }
-
       R->array[j][i] = r;
-
-      //matrix *x = matrix_column_multiply(Q,j,r);
-
-      //matrix_column_subtract(Q,i,x,j);
-
+      matrix_column_subtract(Q,i,matrix_column_multiply(T,0,r),0);
     }
 
     //r[i,i] = ||Qi||
     R->array[i][i] = vector_length(Q,i);
     //Qi = Qi/r[i,i]
     matrix_column_divide(Q,i,R->array[i][i]);
-
   }
 
-  return qr;
+  free_matrix(T);
+  free_matrix(S);
+
 }
 
 /* Creates a matrix and returns a pointer to the struct */
@@ -224,10 +216,6 @@ void free_matrix(matrix *m) {
   free(m);
 }
 
-/* Print the dimensions of a matrix (Debugging purposes only) */
-void print_dimensions(matrix *m) {
-  printf("%dx%d\n",m->rows,m->cols);
-}
 
 /* Debugging purposes only */
 void print_matrix(matrix *m) {
