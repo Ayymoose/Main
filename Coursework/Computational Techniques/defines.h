@@ -8,7 +8,10 @@
 #ifndef DEBUG_DEFINES_H_
 #define DEBUG_DEFINES_H_
 
-#define TYPE float
+#define TYPE double
 #define FLAG "%7.3f"
+
+/* Smaller value of epsilon yields more accurate results for the eigenvalues of A */
+#define EPSILON 0.000001f
 
 #endif /* DEBUG_DEFINES_H_ */
