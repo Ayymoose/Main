@@ -23,11 +23,11 @@ matrix* symmetricise(matrix *m);
 /* Creates a matrix and returns a pointer to the struct */
 matrix* matrix_create(int rows, int cols);
 
+/* Creates the identity matrix */
+matrix* matrix_create_identity(int rows, int cols);
+
 /* Creates a matrix from a stack based array and returns a pointer to the struct */
 matrix* matrix_create_from_array(int rows, int cols, TYPE m[][cols]);
-
-/* Creates a copy of m */
-matrix* matrix_duplicate(matrix *m);
 
 /* Matrix multiplication m3 = (m1 * m2) */
 matrix* matrix_multiply(matrix *m1, matrix *m2, matrix *m3);

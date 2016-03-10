@@ -43,22 +43,6 @@ matrix* symmetricise(matrix *m) {
   return m;
 }
 
-/* Creates a copy of m */
-matrix* matrix_duplicate(matrix *m) {
-
-  /* Same dimensions as m */
-  matrix *c = matrix_create(m->rows, m->cols);
-
-  /* Copy the elements into c */
-  for (int row = 0; row < m->rows; row++) {
-    for (int col = 0; col < m->cols; col++) {
-      c->array[row][col] = m->array[row][col];
-    }
-  }
-
-  return c;
-}
-
 /* Matrix multiplication m3 = (m1 * m2) */
 matrix* matrix_multiply(matrix *m1, matrix *m2, matrix *m3) {
 
@@ -78,6 +62,16 @@ matrix* matrix_multiply(matrix *m1, matrix *m2, matrix *m3) {
     }
   }
   return m3;
+}
+
+/* Creates the identity matrix */
+matrix* matrix_create_identity(int rows, int cols) {
+
+  matrix *m = matrix_create(rows, cols);
+  for (int i=0; i<cols; i++) {
+    m->array[i][i] = 1;
+  }
+  return m;
 }
 
 /* Copies a matrix column from msrc at column col1 to mdst at column col2 */
