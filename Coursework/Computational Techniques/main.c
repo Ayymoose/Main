@@ -48,36 +48,51 @@ int main(int argc, const char **argv) {
   matrix *Q = matrix_create(2,2);
   matrix *R = matrix_create(2,2);
 
-  matrix *I = matrix_create_identity(2,2);
+  matrix *I = matrix_create_diagonal(2,2,1);
   matrix *Accumulator = matrix_create(2,2);
+
+  TYPE sigma = 4;
+  matrix *neg = matrix_create_diagonal(2,2,-sigma);
+  matrix *pos = matrix_create_diagonal(2,2,sigma);
 
   double d1=1,d2=0;
   int iterations = 0;
 
   while (fabs(d1-d2) > EPSILON) {
     QRdecompose(A,Q,R);
+
+
+    matrix_add(A,neg,A);
+
+
     d1 = A->array[0][0];
     matrix_multiply(Q,I,Accumulator);
-
     /* Swap the pointers */
     matrix *temp = I;
     I = Accumulator;
     Accumulator = temp;
 
     matrix_multiply(R,Q,A);
+    matrix_add(A,pos,A);
+
+    print_matrix(A);
+       break;
+
     d2 = A->array[0][0];
     iterations++;
   }
 
-  printf("Iterations %d\n", iterations);
+ /* printf("Iterations %d\n", iterations);
 
   if (write_matrices_to_file(A,Accumulator,"results.txt")) {
     printf("Matrices successfully written to file \n");
-  }
+  }*/
 
   free_matrix(A);
   free_matrix(Q);
   free_matrix(R);
+  free_matrix(I);
+  free_matrix(Accumulator);
 
   return 0;
 }

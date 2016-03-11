@@ -64,12 +64,22 @@ matrix* matrix_multiply(matrix *m1, matrix *m2, matrix *m3) {
   return m3;
 }
 
-/* Creates the identity matrix */
-matrix* matrix_create_identity(int rows, int cols) {
+/* Adds two (square) matrices together m3 = m1 + m2 */
+matrix* matrix_add(matrix *m1, matrix *m2, matrix *m3) {
+  for (int row = 0; row<m3->rows; row++) {
+    for (int col = 0; col<m3->cols; col++) {
+      m3->array[row][col] = m1->array[row][col] + m2->array[row][col];
+    }
+  }
+  return m3;
+}
+
+/* Creates the a matrix with k populating the diagonal */
+matrix* matrix_create_diagonal(int rows, int cols, int k) {
 
   matrix *m = matrix_create(rows, cols);
   for (int i=0; i<cols; i++) {
-    m->array[i][i] = 1;
+    m->array[i][i] = k;
   }
   return m;
 }

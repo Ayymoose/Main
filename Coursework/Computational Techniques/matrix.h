@@ -23,14 +23,17 @@ matrix* symmetricise(matrix *m);
 /* Creates a matrix and returns a pointer to the struct */
 matrix* matrix_create(int rows, int cols);
 
-/* Creates the identity matrix */
-matrix* matrix_create_identity(int rows, int cols);
+/* Creates the a matrix with k populating the diagonal */
+matrix* matrix_create_diagonal(int rows, int cols, int k);
 
 /* Creates a matrix from a stack based array and returns a pointer to the struct */
 matrix* matrix_create_from_array(int rows, int cols, TYPE m[][cols]);
 
 /* Matrix multiplication m3 = (m1 * m2) */
 matrix* matrix_multiply(matrix *m1, matrix *m2, matrix *m3);
+
+/* Adds two (square) matrices together m3 = m1 + m2 */
+matrix* matrix_add(matrix *m1, matrix *m2, matrix *m3);
 
 /* Divides the matrix column c in m by k */
 matrix* matrix_column_divide(matrix *m, int c, TYPE k);
