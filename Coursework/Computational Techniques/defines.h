@@ -11,7 +11,4 @@
 #define TYPE double
 #define FLAG "%7.3f"
 
-/* Smaller value of epsilon yields more accurate results for the eigenvalues of A */
-#define EPSILON 0.0000001f
-
 #endif /* DEBUG_DEFINES_H_ */

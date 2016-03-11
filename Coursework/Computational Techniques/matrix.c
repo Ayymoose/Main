@@ -12,34 +12,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define RANGE 25
+#define RANGE 50
+
+/* Returns a random TYPE */
+TYPE myrandom() {
+  return (((RAND_MAX - rand()) % RANGE) + rand()) % RANGE;
+}
 
 /* Creates a random symmetrix matrix */
 matrix* symmetricise(matrix *m) {
 
-  /* Does not affect the matrix diagonal so creating an empty matrix will have 0s on the diagonal*/
-
   srand(time(NULL));
 
-  /* Randomise only the upper or lower triangluar */
+  /* Create a random TYPE and then duplicate the type across the
+     lower diagonal. Fill the diagonal with a random number. */
   for (int row = 0, c = 1; row < m->rows; row++) {
     for (int col = c; col < m->cols; col++) {
-      int r = (((RAND_MAX - rand()) % RANGE) + rand()) % RANGE;
-      m->array[col][row] = r;
-    }
-    c++;
-  }
-
-  /* Makes array[row][col] = array[col][row] */
-  /* Only to need to swap the upper or lower triangular */
-
-  for (int row = 0, c = 1; row < m->rows; row++) {
-    for (int col = c; col < m->cols; col++) {
+      m->array[col][row] = (TYPE)myrandom();
       m->array[row][col] = m->array[col][row];
     }
+    m->array[row][row] = myrandom();
     c++;
   }
-
   return m;
 }
 
@@ -66,8 +60,8 @@ matrix* matrix_multiply(matrix *m1, matrix *m2, matrix *m3) {
 
 /* Adds two (square) matrices together m3 = m1 + m2 */
 matrix* matrix_add(matrix *m1, matrix *m2, matrix *m3) {
-  for (int row = 0; row<m3->rows; row++) {
-    for (int col = 0; col<m3->cols; col++) {
+  for (int row = 0; row < m3->rows; row++) {
+    for (int col = 0; col < m3->cols; col++) {
       m3->array[row][col] = m1->array[row][col] + m2->array[row][col];
     }
   }
@@ -78,14 +72,14 @@ matrix* matrix_add(matrix *m1, matrix *m2, matrix *m3) {
 matrix* matrix_create_diagonal(int rows, int cols, int k) {
 
   matrix *m = matrix_create(rows, cols);
-  for (int i=0; i<cols; i++) {
+  for (int i = 0; i < cols; i++) {
     m->array[i][i] = k;
   }
   return m;
 }
 
 /* Copies a matrix column from msrc at column col1 to mdst at column col2 */
-void matrix_copy_column(matrix *msrc, int col1, matrix *mdst, int col2) {
+void matrix_copy_column(const matrix *msrc, int col1, matrix *mdst, int col2) {
   for (int i = 0; i < msrc->rows; i++) {
     mdst->array[i][col2] = msrc->array[i][col1];
   }
@@ -108,7 +102,7 @@ matrix* matrix_column_multiply(matrix *m, int c, TYPE k) {
 }
 
 /* Subtracts m2's column c2 from m1's column c1 */
-matrix* matrix_column_subtract(matrix *m1, int c1, matrix *m2, int c2) {
+matrix* matrix_column_subtract(matrix *m1, int c1, const matrix *m2, int c2) {
   for (int i = 0; i < m1->rows; i++) {
     m1->array[i][c1] -= m2->array[i][c2];
   }
@@ -125,7 +119,7 @@ double vector_length(const matrix *m, int column) {
 }
 
 /* Decomposes the matrix A into QR */
-void QRdecompose(matrix *A, matrix *Q, matrix *R) {
+void QRdecompose(const matrix *A, matrix *Q, matrix *R) {
 
   /* Using the Gram-Schmidt process */
 
