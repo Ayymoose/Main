@@ -6,7 +6,7 @@
  */
 
 #include "matrix.h"
-#include "math.h"
+#include <math.h>
 #include <assert.h>
 #include <time.h>
 #include <stdio.h>
