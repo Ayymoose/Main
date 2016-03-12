@@ -42,8 +42,8 @@ bool write_matrices_to_file(const matrix *eigenvalues,
 
 int main(int argc, const char **argv) {
 
-  /*TYPE a[2][2] = {{ 7,2 }, { 2,4}};
-   matrix *A = matrix_create_from_array(2,2,a);*/
+  //TYPE a[2][2] = {{ 0,1 }, { -2,-3}};
+  // matrix *A = matrix_create_from_array(2,2,a);//*/
 
   matrix *A = matrix_create(MATRIX_ROWS, MATRIX_COLS);
   symmetricise(A);
@@ -59,11 +59,11 @@ int main(int argc, const char **argv) {
   matrix *Accumulator = matrix_create(MATRIX_ROWS, MATRIX_COLS);
 
   /* Positive and negative shift matrices */
-  TYPE sigma = A->array[A->rows - 1][A->rows - 1];
+  /*TYPE sigma = A->array[A->rows - 1][A->rows - 1];
   matrix *neg_shift_matrix = matrix_create_diagonal(MATRIX_ROWS, MATRIX_COLS,
       -sigma);
   matrix *pos_shift_matrix = matrix_create_diagonal(MATRIX_ROWS, MATRIX_COLS,
-      sigma);
+      sigma);*/
 
   double d1 = 1, d2 = 0;
 
@@ -72,7 +72,7 @@ int main(int argc, const char **argv) {
     d1 = A->array[0][0];
 
     /* Subtract shift matrix from A */
-    matrix_add(A, neg_shift_matrix, A);
+    //matrix_add(A, neg_shift_matrix, A);
 
     /* A = QR */
     QRdecompose(A, Q, R);
@@ -89,7 +89,7 @@ int main(int argc, const char **argv) {
     matrix_multiply(R, Q, A);
 
     /* Add shift matrix to A */
-    matrix_add(A, pos_shift_matrix, A);
+    //matrix_add(A, pos_shift_matrix, A);
 
     d2 = A->array[0][0];
   }
@@ -111,8 +111,8 @@ int main(int argc, const char **argv) {
   free_matrix(R);
   free_matrix(I);
   free_matrix(Accumulator);
-  free_matrix(neg_shift_matrix);
-  free_matrix(pos_shift_matrix);
+  //free_matrix(neg_shift_matrix);
+  //free_matrix(pos_shift_matrix);
 
   return 0;
 }
