@@ -9,12 +9,14 @@
 #define MATRIX_H_
 
 #include "defines.h"
+#include <stdbool.h>
 
-#define MATRIX_ROWS 2
-#define MATRIX_COLS 2
+/* Change here to adjust matrix size*/
+#define MATRIX_ROWS 8
+#define MATRIX_COLS 8
 
 /* Smaller value of epsilon yields more accurate results for the eigenvalues of A */
-#define EPSILON 0.0001f
+#define EPSILON 0.000001
 
 typedef struct {
   TYPE **array; /* Pointer to an array of type TYPE */
@@ -28,17 +30,14 @@ matrix* symmetricise(matrix *m);
 /* Creates a matrix and returns a pointer to the struct */
 matrix* matrix_create(int rows, int cols);
 
-/* Creates the a matrix with k populating the diagonal */
-matrix* matrix_create_diagonal(int rows, int cols, int k);
-
-/* Creates a matrix from a stack based array and returns a pointer to the struct */
-matrix* matrix_create_from_array(int rows, int cols, TYPE m[][cols]);
+/* Checks if a matrix is diagonal */
+bool matrix_is_diagonal(const matrix *m);
 
 /* Matrix multiplication m3 = (m1 * m2) */
-matrix* matrix_multiply(matrix *m1, matrix *m2, matrix *m3);
+matrix* matrix_multiply(const matrix *m1, const matrix *m2, matrix *m3);
 
 /* Adds two (square) matrices together m3 = m1 + m2 */
-matrix* matrix_add(matrix *m1, matrix *m2, matrix *m3);
+matrix* matrix_add(const matrix *m1, const matrix *m2, matrix *m3);
 
 /* Divides the matrix column c in m by k */
 matrix* matrix_column_divide(matrix *m, int c, TYPE k);

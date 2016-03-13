@@ -6,12 +6,15 @@
  */
 
 #include "matrix.h"
+
 #include <math.h>
-#include <assert.h>
+//#include <assert.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
+/* Change to adjust the maximum random value */
 #define RANGE 50
 
 /* Returns a random TYPE */
@@ -37,11 +40,27 @@ matrix* symmetricise(matrix *m) {
   return m;
 }
 
+/* Checks if a matrix is diagonal */
+bool matrix_is_diagonal(const matrix *m) {
+  for (int row=0; row<m->rows; row++) {
+    for (int col=0; col<m->cols; col++) {
+      if (row != col) {
+        if (fabs(m->array[row][col]) > EPSILON) {
+          return false;
+        }
+      } else {
+        continue;
+      }
+    }
+  }
+  return true;
+}
+
 /* Matrix multiplication m3 = (m1 * m2) */
-matrix* matrix_multiply(matrix *m1, matrix *m2, matrix *m3) {
+matrix* matrix_multiply(const matrix *m1, const matrix *m2, matrix *m3) {
 
   /* Remove for performance */
-  assert(m1->cols == m2->rows);
+  //assert(m1->cols == m2->rows);
 
   TYPE sum = 0;
 
@@ -59,23 +78,13 @@ matrix* matrix_multiply(matrix *m1, matrix *m2, matrix *m3) {
 }
 
 /* Adds two (square) matrices together m3 = m1 + m2 */
-matrix* matrix_add(matrix *m1, matrix *m2, matrix *m3) {
+matrix* matrix_add(const matrix *m1, const matrix *m2, matrix *m3) {
   for (int row = 0; row < m3->rows; row++) {
     for (int col = 0; col < m3->cols; col++) {
       m3->array[row][col] = m1->array[row][col] + m2->array[row][col];
     }
   }
   return m3;
-}
-
-/* Creates the a matrix with k populating the diagonal */
-matrix* matrix_create_diagonal(int rows, int cols, int k) {
-
-  matrix *m = matrix_create(rows, cols);
-  for (int i = 0; i < cols; i++) {
-    m->array[i][i] = k;
-  }
-  return m;
 }
 
 /* Copies a matrix column from msrc at column col1 to mdst at column col2 */
@@ -177,22 +186,6 @@ matrix* matrix_create(int rows, int cols) {
   return array;
 }
 
-/* Creates a matrix from a stack based array and returns a pointer to the struct */
-matrix* matrix_create_from_array(int rows, int cols, TYPE m[][cols]) {
-
-  /* Create an empty matrix */
-  matrix *array = matrix_create(rows, cols);
-
-  /* Populate the matrix with m's values */
-  for (int row = 0; row < rows; row++) {
-    for (int col = 0; col < cols; col++) {
-      array->array[row][col] = m[row][col];
-    }
-  }
-
-  return array;
-}
-
 /* Frees a matrix */
 void free_matrix(matrix *m) {
   /* Frees the elements inside the matrix */
@@ -205,12 +198,12 @@ void free_matrix(matrix *m) {
 /* Debugging purposes only */
 void print_matrix(const matrix *m) {
   for (int row = 0; row < m->rows; row++) {
-    printf("[");
+    //printf("[");
     for (int col = 0; col < m->cols - 1; col++) {
-      printf(FLAG", ", m->array[row][col]);
+      printf(FLAG" ", m->array[row][col]);
     }
     printf(FLAG, m->array[row][m->cols - 1]);
-    printf("]\n");
+    printf("\n");
   }
   printf("\n");
 }
