@@ -29,7 +29,19 @@ gameBoyROM* parseROM(unsigned char* rom) {
   if (rom) {
 
     //Great, I have to change the malloc inside the disassembler
-    gameBoyROM* romHeader = (gameBoyROM*)malloc(sizeof(gameBoyROM));
+    gameBoyROM* romHeader = (gameBoyROM*)calloc(1,sizeof(gameBoyROM));
+	/*
+	
+	romHeader -> title -> ...
+			  -> licenceHigh
+			  -> licenseLow
+			  -> feature
+			  -> cartridgeType
+			  -> romSize
+			  -> ramSize
+			  -> destCode
+			  -> licenseeCode
+	*/
 
     //Read the title first
     rom += CARTRIDGE_HEADER_ADDRESS;
@@ -37,8 +49,7 @@ gameBoyROM* parseROM(unsigned char* rom) {
     for (int i=0; i < MAX_TITLE_LENGTH; i++) {
       romHeader->title[i] = rom[i];
     }
-
-    rom += MAX_TITLE_LENGTH;
+	rom += MAX_TITLE_LENGTH;
 
     //Licensee code (high & low)
     romHeader->licenceHigh = *++rom;

@@ -1,7 +1,7 @@
-#pragma once
+#pragma once //Visual studio macro
 #include <stdio.h>
 
-#define MAX_TITLE_LENGTH 15 //Or 16??
+#define MAX_TITLE_LENGTH 15 //Or 16?? //Changing this causes the results to change
 
 //General structure of the ROM header for gameboy ROMs
 typedef struct romHeader {
@@ -14,7 +14,7 @@ typedef struct romHeader {
   unsigned char ramSize;        /* RAM Size */
   unsigned char destCode;       /* Destination code */
   unsigned char licenseeCode;   /* Licensee code (old) */
-                                //Omitted three other fields we don't care about (checkSum + complement + mask ROM Version)
+  //Omitted three other fields we don't care about (checkSum + complement + mask ROM Version)
 } gameBoyROM;
 
 //Load a ROM file and return a pointer to the memory
