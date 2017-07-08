@@ -1,0 +1,4 @@
+﻿  cartridge.c
+e:\backup\ayman\programming\github\main\c\gameboyrom\gameboyrom\cartridge.c(658): warning C4172: returning address of local variable or temporary: romInformation
+  GameBoyROM.vcxproj -> E:\Backup\Ayman\Programming\github\Main\C\GameBoyROM\Debug\GameBoyROM.exe
+  GameBoyROM.vcxproj -> E:\Backup\Ayman\Programming\github\Main\C\GameBoyROM\Debug\GameBoyROM.pdb (Full PDB)

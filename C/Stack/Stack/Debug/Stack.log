@@ -1,0 +1,16 @@
+﻿Build started 07/04/2015 2:33:22 AM.
+     1>Project "E:\Ayman\Programming\github\Main\C\Stack\Stack\Stack.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt main.c stack.c
+         stack.c
+         main.c
+         Generating Code...
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\Ayman\Programming\github\Main\C\Stack\Debug\Stack.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"E:\Ayman\Programming\github\Main\C\Stack\Debug\Stack.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\Ayman\Programming\github\Main\C\Stack\Debug\Stack.lib" /MACHINE:X86 Debug\main.obj
+         Debug\stack.obj
+         Stack.vcxproj -> E:\Ayman\Programming\github\Main\C\Stack\Debug\Stack.exe
+     1>Done Building Project "E:\Ayman\Programming\github\Main\C\Stack\Stack\Stack.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.49
